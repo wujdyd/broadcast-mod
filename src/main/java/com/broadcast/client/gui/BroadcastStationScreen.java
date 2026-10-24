@@ -445,12 +445,6 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
             drawScrollbar(g, lx + lw - 6, ly + 3, lh - 6, files.size(), visible, scroll);
         }
 
-        if (view != null && !view.music().isEmpty()) {
-            g.drawString(font, Component.translatable("gui.broadcast.search_count",
-                            files.size(), view.music().size()),
-                    x + 200, y + 126, GuiTheme.FAINT, false);
-        }
-
         int ix = x + 194, iy = y + 146, iw = 76, ih = 52;
         GuiTheme.rr(g, ix, iy, iw, ih, GuiTheme.CARD, GuiTheme.BORDER);
         if (selectedIndex >= 0 && selectedIndex < files.size()) {
@@ -466,17 +460,6 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
         } else {
             g.drawString(font, Component.translatable("gui.broadcast.select_hint"), ix + 6, iy + 22,
                     GuiTheme.FAINT, false);
-        }
-
-        // 播放列表入口状态
-        if (view != null) {
-            boolean loop = view.playlistLoop();
-            String state = loop
-                    ? Component.translatable("gui.broadcast.playlist.entries_running",
-                    view.playlist().size()).getString()
-                    : Component.translatable("gui.broadcast.playlist.entries",
-                    view.playlist().size()).getString();
-            g.drawString(font, state, x + 194, y + 136, loop ? GuiTheme.GREEN : GuiTheme.FAINT, false);
         }
     }
 

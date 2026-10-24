@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    " C ",
+    "   "
+  ],
+  "key": {
+    "I": { "item": "minecraft:iron_ingot" },
+    "C": { "item": "minecraft:copper_ingot" }
+  },
+  "result": {
+    "item": "broadcast:ceiling_speaker",
+    "count": 1
+  }
+}

@@ -1,0 +1,77 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+group = 'com.broadcast'
+version = '0.0.1br'
+
+base {
+    archivesName = 'broadcast'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+// 内置 JLayer(MP3 解码)通过 Jar-in-Jar 打包，玩家无需额外安装
+jarJar.enable()
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                broadcast {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            jvmArgs '-Xmx1G', '-Dfile.encoding=UTF-8'
+            args '--nogui'
+            mods {
+                broadcast {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.2.20'
+
+    // MP3 解码器(纯 Java, LGPL-2.1)。打进 jar,客户端即可原生播放 mp3
+    jarJar(group: 'com.googlecode.soundlibs', name: 'jlayer', version: '[1.0.1.4,1.0.1.5)') {
+        jarJar.pin(it, '1.0.1.4')
+        exclude group: 'junit', module: 'junit'
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'     : 'broadcast',
+                'Specification-Vendor'    : 'Ruyi Workbench',
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.version,
+                'Implementation-Vendor'   : 'Ruyi Workbench',
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')

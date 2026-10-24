@@ -1,0 +1,71 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "broadcast:block/horn",
+    "horn": "broadcast:block/horn",
+    "inner": "broadcast:block/inner",
+    "metal": "broadcast:block/metal"
+  },
+  "elements": [
+    {
+      "comment": "壁挂底板",
+      "from": [5, 5, 0],
+      "to": [11, 11, 1],
+      "faces": {
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "down": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "颈部",
+      "from": [6.5, 6.5, 1],
+      "to": [9.5, 9.5, 4],
+      "faces": {
+        "up": { "texture": "#metal" },
+        "down": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "号筒第一节",
+      "from": [5, 5, 4],
+      "to": [11, 11, 7],
+      "faces": {
+        "up": { "texture": "#horn" },
+        "down": { "texture": "#horn" },
+        "east": { "texture": "#horn" },
+        "west": { "texture": "#horn" },
+        "south": { "texture": "#horn" }
+      }
+    },
+    {
+      "comment": "号筒第二节",
+      "from": [3.5, 3.5, 7],
+      "to": [12.5, 12.5, 11],
+      "faces": {
+        "up": { "texture": "#horn" },
+        "down": { "texture": "#horn" },
+        "east": { "texture": "#horn" },
+        "west": { "texture": "#horn" },
+        "south": { "texture": "#horn" }
+      }
+    },
+    {
+      "comment": "号口",
+      "from": [2, 2, 11],
+      "to": [14, 14, 14],
+      "faces": {
+        "up": { "texture": "#horn" },
+        "down": { "texture": "#horn" },
+        "east": { "texture": "#horn" },
+        "west": { "texture": "#horn" },
+        "south": { "texture": "#inner" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="broadcast"
+version="0.0.1br"
+displayName="广播站 Broadcast 0.0.1br"
+logoFile="broadcast_logo.png"
+credits="如意工作台生成"
+authors="Ruyi Workbench"
+description='''
+校园/车站风格的广播系统:
+挂墙式、吸顶式、落地式三种广播器,按频率连接广播站与话筒;
+广播站支持多频率同步广播、在线音乐/本地上传音乐、原生 MP3 与定时循环;
+话筒拥有独立 GUI(频率/红石模式/讲话暂停音乐),红石驱动实时广播。
+'''
+
+[[dependencies.broadcast]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.broadcast]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.21)"
+    ordering="NONE"
+    side="BOTH"

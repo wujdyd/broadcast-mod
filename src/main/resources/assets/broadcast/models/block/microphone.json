@@ -1,0 +1,60 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "broadcast:block/micmesh",
+    "mesh": "broadcast:block/micmesh",
+    "metal": "broadcast:block/metal",
+    "pole": "broadcast:block/pole"
+  },
+  "elements": [
+    {
+      "comment": "底座",
+      "from": [5, 0, 5],
+      "to": [11, 1, 11],
+      "faces": {
+        "down": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "支杆",
+      "from": [7.5, 1, 7.5],
+      "to": [8.5, 8, 8.5],
+      "faces": {
+        "north": { "texture": "#pole" },
+        "south": { "texture": "#pole" },
+        "east": { "texture": "#pole" },
+        "west": { "texture": "#pole" }
+      }
+    },
+    {
+      "comment": "拾音头 collar",
+      "from": [6.8, 7.4, 6.8],
+      "to": [9.2, 8.4, 9.2],
+      "faces": {
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "up": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "拾音头网罩",
+      "from": [6, 8.4, 6],
+      "to": [10, 13, 10],
+      "faces": {
+        "north": { "texture": "#mesh" },
+        "south": { "texture": "#mesh" },
+        "east": { "texture": "#mesh" },
+        "west": { "texture": "#mesh" },
+        "up": { "texture": "#mesh" },
+        "down": { "texture": "#mesh" }
+      }
+    }
+  ]
+}

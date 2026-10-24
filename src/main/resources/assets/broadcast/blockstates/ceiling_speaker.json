@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "facing=down": { "model": "broadcast:block/ceiling_speaker" },
+    "facing=up": { "model": "broadcast:block/ceiling_speaker", "x": 180 }
+  }
+}

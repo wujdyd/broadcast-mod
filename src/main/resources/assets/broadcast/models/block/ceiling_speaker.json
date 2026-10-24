@@ -1,0 +1,75 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "broadcast:block/horn",
+    "shell": "broadcast:block/horn",
+    "grille": "broadcast:block/grille",
+    "inner": "broadcast:block/inner"
+  },
+  "elements": [
+    {
+      "comment": "吸顶底盘 A",
+      "from": [3, 13.5, 3],
+      "to": [13, 16, 13],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "east": { "texture": "#shell" },
+        "west": { "texture": "#shell" }
+      }
+    },
+    {
+      "comment": "吸顶底盘 B(旋转 45° 拼成八角,略微下沉避免与 A 共面闪烁)",
+      "from": [3, 13.44, 3],
+      "to": [13, 16, 13],
+      "rotation": { "origin": [8, 14.75, 8], "axis": "y", "angle": 45, "rescale": false },
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "east": { "texture": "#shell" },
+        "west": { "texture": "#shell" }
+      }
+    },
+    {
+      "comment": "锥盆外环 A",
+      "from": [4.5, 12, 4.5],
+      "to": [11.5, 13.5, 11.5],
+      "faces": {
+        "down": { "texture": "#grille" },
+        "north": { "texture": "#grille" },
+        "south": { "texture": "#grille" },
+        "east": { "texture": "#grille" },
+        "west": { "texture": "#grille" }
+      }
+    },
+    {
+      "comment": "锥盆外环 B(旋转 45°,略微下沉避免共面闪烁)",
+      "from": [4.5, 11.94, 4.5],
+      "to": [11.5, 13.5, 11.5],
+      "rotation": { "origin": [8, 12.75, 8], "axis": "y", "angle": 45, "rescale": false },
+      "faces": {
+        "down": { "texture": "#grille" },
+        "north": { "texture": "#grille" },
+        "south": { "texture": "#grille" },
+        "east": { "texture": "#grille" },
+        "west": { "texture": "#grille" }
+      }
+    },
+    {
+      "comment": "中心防尘罩",
+      "from": [6.5, 11, 6.5],
+      "to": [9.5, 12.2, 9.5],
+      "faces": {
+        "down": { "texture": "#inner" },
+        "north": { "texture": "#inner" },
+        "south": { "texture": "#inner" },
+        "east": { "texture": "#inner" },
+        "west": { "texture": "#inner" }
+      }
+    }
+  ]
+}

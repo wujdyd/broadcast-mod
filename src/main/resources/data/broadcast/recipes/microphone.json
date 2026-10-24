@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " N ",
+    "NIN",
+    " R "
+  ],
+  "key": {
+    "N": { "item": "minecraft:iron_nugget" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": {
+    "item": "broadcast:microphone",
+    "count": 1
+  }
+}

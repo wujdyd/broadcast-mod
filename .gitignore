@@ -1,0 +1,21 @@
+# 构建产物与运行目录
+.gradle/
+build/
+run/
+runs/
+out/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+bin/
+
+# 本地工具(下载的 JDK/Gradle/日志)
+tools/*.zip
+tools/*.jar
+tools/jdk17/
+tools/gradle-8.1.1/
+tools/*.log
+
+tools/fs_tmp/

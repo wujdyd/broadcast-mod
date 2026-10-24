@@ -1,0 +1,59 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "broadcast:block/cabinet",
+    "cabinet": "broadcast:block/cabinet",
+    "grille": "broadcast:block/grille",
+    "metal": "broadcast:block/metal",
+    "pole": "broadcast:block/pole"
+  },
+  "elements": [
+    {
+      "comment": "底座",
+      "from": [4, 0, 4],
+      "to": [12, 1, 12],
+      "faces": {
+        "down": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "立柱",
+      "from": [7, 1, 7],
+      "to": [9, 5, 9],
+      "faces": {
+        "north": { "texture": "#pole" },
+        "south": { "texture": "#pole" },
+        "east": { "texture": "#pole" },
+        "west": { "texture": "#pole" }
+      }
+    },
+    {
+      "comment": "音柱箱体",
+      "from": [4.5, 5, 5],
+      "to": [11.5, 15, 11],
+      "faces": {
+        "north": { "texture": "#grille" },
+        "south": { "texture": "#cabinet" },
+        "east": { "texture": "#cabinet" },
+        "west": { "texture": "#cabinet" }
+      }
+    },
+    {
+      "comment": "箱顶",
+      "from": [4.5, 15, 5],
+      "to": [11.5, 16, 11],
+      "faces": {
+        "up": { "texture": "#metal" },
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" }
+      }
+    }
+  ]
+}

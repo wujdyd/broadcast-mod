@@ -36,7 +36,9 @@ public record MicUploadPacket(BlockPos mic, byte[] pcm) {
                 return;
             }
             if (p.pcm == null || p.pcm.length == 0) {
-                // 客户端无法采集:复位状态,避免显示「广播中」却没有声音
+                // 客户端无法采集:只通知广播器附近的玩家,并复位状态
+                com.broadcast.server.MicCapture.notifyFailure(mic,
+                        net.minecraft.network.chat.Component.translatable("msg.broadcast.mic_unavailable_client"));
                 mic.forceStop();
                 return;
             }

@@ -198,6 +198,26 @@ ffmpeg = "ffmpeg"
 
 ---
 
+## 网络视频音频
+
+网络音乐页可直接粘贴 B站、抖音、快手、YouTube、TikTok、微博、优酷等视频链接。服务器需要安装：
+
+- `yt-dlp`（解析视频、下载最佳音轨）
+- `ffmpeg`（把 m4a/webm 转成 mp3）
+
+安装示例：
+
+```powershell
+winget install yt-dlp.yt-dlp
+winget install Gyan.FFmpeg
+```
+
+Linux：`pip install -U yt-dlp` + `apt install ffmpeg`。
+
+解析结果会缓存到 `broadcast_music/video_<hash>.mp3`，之后可直接复用。没有安装工具时只影响视频链接，普通音频直链/本地音乐不受影响。
+
+---
+
 ## 多人联机「无效会话」
 
 这是 Mojang 正版会话验证失败，不是本模组网络错误：

@@ -263,8 +263,12 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
 
     private void playStartSound() {
         if (!startSoundEnabled || !(level instanceof ServerLevel sl)) return;
-        sl.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.BELL_BLOCK,
-                net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.6F);
+        List<BlockPos> speakers = getOutputSpeakers();
+        if (speakers.isEmpty()) speakers = List.of(worldPosition);
+        for (BlockPos pos : speakers) {
+            sl.playSound(null, pos, net.minecraft.sounds.SoundEvents.BELL_BLOCK,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.6F);
+        }
     }
 
     private void stopBroadcast() {

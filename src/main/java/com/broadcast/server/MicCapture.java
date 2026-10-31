@@ -60,6 +60,11 @@ public final class MicCapture {
         return supportedFormat() != null;
     }
 
+    /** 供客户端采集失败包调用:把失败消息发给广播器附近的玩家。 */
+    public static void notifyFailure(MicrophoneBlockEntity mic, Component msg) {
+        notifyNear(mic, msg);
+    }
+
     private static String key(MicrophoneBlockEntity mic) {
         if (mic.getLevel() == null) return "unknown";
         return mic.getLevel().dimension().location() + "@" + mic.getBlockPos().toShortString();

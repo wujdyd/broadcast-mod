@@ -82,6 +82,10 @@ Secondary playlist GUI: loop, forward/reverse, gap, per-track duration; scroll v
 
 Native JLayer decoding, bundled. ID3v2 tags are skipped before decoding; Header is validated; the old `getFrequency()` bug is fixed.
 
+## Video Audio
+
+Paste Bilibili, Douyin, Kuaishou, YouTube, TikTok, Weibo, Youku, etc. links in the Online Music tab. The server needs `yt-dlp` and `ffmpeg` in PATH (configurable in `[video]`). Results are cached as `broadcast_music/video_<hash>.mp3`; direct audio URLs and local files never require these tools.
+
 ## Multiplayer "Invalid session"
 
 That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.3br2`.

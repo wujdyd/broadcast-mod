@@ -10,6 +10,9 @@ out/
 .project
 .settings/
 bin/
+run_server*.log
+hs_err_pid*.log
+replay_pid*.log
 
 # 本地工具(下载的 JDK/Gradle/日志)
 tools/*.zip

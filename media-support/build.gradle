@@ -1,0 +1,64 @@
+plugins {
+    id 'eclipse'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+group = 'com.broadcast.media'
+version = '0.0.3br'
+
+base {
+    archivesName = 'broadcast_media_support'
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    copyIdeResources = true
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            mods { broadcast_media_support { source sourceSets.main } }
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            args '--nogui'
+            mods { broadcast_media_support { source sourceSets.main } }
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.2.20'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    from('LICENSE')
+    manifest {
+        attributes([
+                'Specification-Title'     : 'broadcast_media_support',
+                'Specification-Vendor'    : 'Ruyi Workbench',
+                'Specification-Version'   : '1',
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.version,
+                'Implementation-Vendor'   : 'Ruyi Workbench'
+        ])
+    }
+}
+
+if (!project.hasProperty('noReobf')) {
+    jar.finalizedBy('reobfJar')
+}

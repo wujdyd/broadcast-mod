@@ -22,3 +22,4 @@ tools/gradle-8.1.1/
 tools/*.log
 
 tools/fs_tmp/
+media-support/build.log

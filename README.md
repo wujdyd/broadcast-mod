@@ -55,8 +55,9 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 产物：
 
-- `build/libs/broadcast-0.0.3br-all.jar` —— **发布用**（含 JLayer）
+- `build/libs/broadcast-0.0.3br-all.jar` —— **发布用**（含 JLayer/jFLAC）
 - `build/libs/broadcast-0.0.3br.jar` —— 不含内置依赖
+- `media-support/build/libs/broadcast_media_support-0.0.3br.jar` —— 视频音频附属（可选）
 
 ---
 
@@ -189,32 +190,30 @@ detectionRadius = 10
 
 [audio]
 speakerRadius = 18
-
-[video]
-enabled = true
-ytdlp = "yt-dlp"
-ffmpeg = "ffmpeg"
 ```
+
+附属的配置在 `config/broadcast_media_support-common.toml`。
 
 ---
 
-## 网络视频音频
+## 网络视频音频（需要独立附属）
 
-网络音乐页可直接粘贴 B站、抖音、快手、YouTube、TikTok、微博、优酷等视频链接。服务器需要安装：
+视频链接由独立附属 **Broadcast Media Support** 处理，主 jar 不内置 yt-dlp/ffmpeg。
 
-- `yt-dlp`（解析视频、下载最佳音轨）
-- `ffmpeg`（把 m4a/webm 转成 mp3）
+安装：
 
-安装示例：
+- `broadcast-0.0.3br-all.jar`（主模组）
+- `broadcast_media_support-0.0.3br.jar`（附属，放在 `mods/`）
 
-```powershell
-winget install yt-dlp.yt-dlp
-winget install Gyan.FFmpeg
+未安装附属时，播放视频链接会提示：
+
+```text
+未安装broadcast media support，无法播放
 ```
 
-Linux：`pip install -U yt-dlp` + `apt install ffmpeg`。
+附属首次使用会自动下载 `yt-dlp`（约 17MB）和 `ffmpeg`（约 80MB）到 `config/broadcast_media_support/tools/`，支持 Windows / Linux / macOS。不能联网的服务器可手动放置工具并在 `config/broadcast_media_support-common.toml` 填绝对路径。
 
-解析结果会缓存到 `broadcast_music/video_<hash>.mp3`，之后可直接复用。没有安装工具时只影响视频链接，普通音频直链/本地音乐不受影响。
+解析结果缓存为 `broadcast_music/video_<hash>.mp3`。普通音频直链和本地音乐不需要附属。
 
 ---
 

@@ -18,8 +18,6 @@ public class BroadcastConfig {
     public static final ForgeConfigSpec.IntValue MIC_DETECTION_RADIUS;
     public static final ForgeConfigSpec.IntValue SPEAKER_RADIUS;
     public static final ForgeConfigSpec.BooleanValue VIDEO_ENABLED;
-    public static final ForgeConfigSpec.ConfigValue<String> VIDEO_YTDLP;
-    public static final ForgeConfigSpec.ConfigValue<String> VIDEO_FFMPEG;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -54,12 +52,8 @@ public class BroadcastConfig {
         b.pop();
 
         b.comment("网络视频音频解析(需要服务器安装 yt-dlp 与 ffmpeg)").push("video");
-        VIDEO_ENABLED = b.comment("是否允许解析 B站/抖音/快手/YouTube/TikTok 等视频链接")
+        VIDEO_ENABLED = b.comment("是否允许解析视频链接(需要安装 Broadcast Media Support 附属)")
                 .define("enabled", true);
-        VIDEO_YTDLP = b.comment("yt-dlp 可执行文件路径(默认从 PATH 查找)")
-                .define("ytdlp", "yt-dlp");
-        VIDEO_FFMPEG = b.comment("ffmpeg 可执行文件路径(默认从 PATH 查找)")
-                .define("ffmpeg", "ffmpeg");
         b.pop();
 
         SPEC = b.build();
@@ -100,14 +94,6 @@ public class BroadcastConfig {
 
     public static boolean videoEnabled() {
         return VIDEO_ENABLED.get();
-    }
-
-    public static String ytDlp() {
-        return VIDEO_YTDLP.get();
-    }
-
-    public static String ffmpeg() {
-        return VIDEO_FFMPEG.get();
     }
 
     /** 按配置决定当前服务器是否应使用客户端采集。 */

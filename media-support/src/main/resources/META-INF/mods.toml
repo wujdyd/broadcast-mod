@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="broadcast_media_support"
+version="0.0.3br"
+displayName="Broadcast Media Support 0.0.3br"
+description='''
+广播站附属:自动下载/管理 yt-dlp 与 ffmpeg,为 B站/抖音/快手/YouTube/TikTok 等视频链接提供音频解析。
+独立模组;未安装时主模组会提示“未安装broadcast media support，无法播放”。
+'''
+
+[[dependencies.broadcast_media_support]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.broadcast_media_support]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1,1.20.2)"
+    ordering="NONE"
+    side="BOTH"

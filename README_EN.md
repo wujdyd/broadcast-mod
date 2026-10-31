@@ -82,9 +82,18 @@ Secondary playlist GUI: loop, forward/reverse, gap, per-track duration; scroll v
 
 Native JLayer decoding, bundled. ID3v2 tags are skipped before decoding; Header is validated; the old `getFrequency()` bug is fixed.
 
-## Video Audio
+## Video Audio (companion mod)
 
-Paste Bilibili, Douyin, Kuaishou, YouTube, TikTok, Weibo, Youku, etc. links in the Online Music tab. The server needs `yt-dlp` and `ffmpeg` in PATH (configurable in `[video]`). Results are cached as `broadcast_music/video_<hash>.mp3`; direct audio URLs and local files never require these tools.
+Video links are handled by the separate **Broadcast Media Support** addon; the main jar does not bundle yt-dlp/ffmpeg.
+
+Install both:
+
+- `broadcast-0.0.3br-all.jar`
+- `broadcast_media_support-0.0.3br.jar`
+
+Without the addon the main mod reports exactly: `未安装broadcast media support，无法播放`.
+
+The addon downloads yt-dlp (~17 MB) and ffmpeg (~80 MB) on first use into `config/broadcast_media_support/tools/` (Windows/Linux/macOS). For offline servers, set absolute paths in `config/broadcast_media_support-common.toml`.
 
 ## Multiplayer "Invalid session"
 

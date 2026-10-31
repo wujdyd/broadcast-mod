@@ -11,12 +11,15 @@ import com.broadcast.network.packet.MusicChunkPacket;
 import com.broadcast.network.packet.MusicListPacket;
 import com.broadcast.network.packet.PlayRequestPacket;
 import com.broadcast.network.packet.PlaybackStatePacket;
+import com.broadcast.network.packet.PortableMicControlPacket;
+import com.broadcast.network.packet.PortableMicUploadPacket;
 import com.broadcast.network.packet.RequestDataPacket;
 import com.broadcast.network.packet.RequestDeviceInfoPacket;
 import com.broadcast.network.packet.RequestFilePacket;
 import com.broadcast.network.packet.SetMicSettingsPacket;
 import com.broadcast.network.packet.SetPlaylistPacket;
 import com.broadcast.network.packet.SetPlaylistSettingsPacket;
+import com.broadcast.network.packet.SetPortableMicSettingsPacket;
 import com.broadcast.network.packet.SetSettingsPacket;
 import com.broadcast.network.packet.SetSpeakerFrequencyPacket;
 import com.broadcast.network.packet.SetStationFrequenciesPacket;
@@ -30,7 +33,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetworkHandler {
-    private static final String PROTOCOL = "0.0.1br";
+    private static final String PROTOCOL = "0.0.1br2";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BroadcastMod.MODID, "main"),
@@ -78,6 +81,12 @@ public class NetworkHandler {
         CHANNEL.messageBuilder(DeleteMusicPacket.class, id++)
                 .encoder(DeleteMusicPacket::encode).decoder(DeleteMusicPacket::decode)
                 .consumerMainThread(DeleteMusicPacket::handle).add();
+        CHANNEL.messageBuilder(SetPortableMicSettingsPacket.class, id++)
+                .encoder(SetPortableMicSettingsPacket::encode).decoder(SetPortableMicSettingsPacket::decode)
+                .consumerMainThread(SetPortableMicSettingsPacket::handle).add();
+        CHANNEL.messageBuilder(PortableMicUploadPacket.class, id++)
+                .encoder(PortableMicUploadPacket::encode).decoder(PortableMicUploadPacket::decode)
+                .consumerMainThread(PortableMicUploadPacket::handle).add();
         // S2C
         CHANNEL.messageBuilder(MusicListPacket.class, id++)
                 .encoder(MusicListPacket::encode).decoder(MusicListPacket::decode)
@@ -103,6 +112,9 @@ public class NetworkHandler {
         CHANNEL.messageBuilder(DeviceInfoPacket.class, id++)
                 .encoder(DeviceInfoPacket::encode).decoder(DeviceInfoPacket::decode)
                 .consumerMainThread(DeviceInfoPacket::handle).add();
+        CHANNEL.messageBuilder(PortableMicControlPacket.class, id++)
+                .encoder(PortableMicControlPacket::encode).decoder(PortableMicControlPacket::decode)
+                .consumerMainThread(PortableMicControlPacket::handle).add();
     }
 
     public static void sendToServer(Object msg) {

@@ -22,5 +22,6 @@ public class ClientEvents {
     public static void onDisconnect(ClientPlayerNetworkEvent.LoggingOut event) {
         ClientAudioManager.stopAll();
         ClientMicController.stopAll();
+        PortableMicController.stopAll();
     }
 }

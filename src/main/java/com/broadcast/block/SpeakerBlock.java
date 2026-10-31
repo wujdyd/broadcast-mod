@@ -42,7 +42,7 @@ import javax.annotation.Nullable;
  * 放置后自动注册进维度设备表,由最近的广播站检索连接。
  */
 public class SpeakerBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
-    public enum Type { WALL, CEILING, FLOOR }
+    public enum Type { WALL, CEILING, FLOOR, PILLAR }
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -85,7 +85,7 @@ public class SpeakerBlock extends Block implements EntityBlock, SimpleWaterlogge
             return state.setValue(FACING, dir);
         }
 
-        if (type == Type.WALL) {
+        if (type == Type.WALL || type == Type.PILLAR) {
             Direction dir = face.getAxis().isHorizontal() ? face : ctx.getHorizontalDirection().getOpposite();
             BlockPos supportPos = pos.relative(dir.getOpposite());
             if (!level.getBlockState(supportPos).isFaceSturdy(level, supportPos, dir)) {
@@ -146,6 +146,10 @@ public class SpeakerBlock extends Block implements EntityBlock, SimpleWaterlogge
     private static final VoxelShape CEILING_DOWN = box(2.5, 10, 2.5, 13.5, 16, 13.5);
     private static final VoxelShape CEILING_UP = box(2.5, 0, 2.5, 13.5, 6, 13.5);
     private static final VoxelShape FLOOR_SHAPE = Shapes.or(box(4, 0, 4, 12, 1, 12), box(4.5, 1, 4.5, 11.5, 16, 11.5));
+    private static final VoxelShape PILLAR_SOUTH = box(5, 0, 0, 11, 16, 5);
+    private static final VoxelShape PILLAR_NORTH = box(5, 0, 11, 11, 16, 16);
+    private static final VoxelShape PILLAR_EAST = box(0, 0, 5, 5, 16, 11);
+    private static final VoxelShape PILLAR_WEST = box(11, 0, 5, 16, 16, 11);
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
@@ -155,6 +159,14 @@ public class SpeakerBlock extends Block implements EntityBlock, SimpleWaterlogge
         }
         if (type == Type.FLOOR) {
             return FLOOR_SHAPE;
+        }
+        if (type == Type.PILLAR) {
+            return switch (dir) {
+                case SOUTH -> PILLAR_SOUTH;
+                case NORTH -> PILLAR_NORTH;
+                case EAST -> PILLAR_EAST;
+                default -> PILLAR_WEST;
+            };
         }
         switch (dir) {
             case SOUTH: return WALL_SOUTH;
@@ -170,6 +182,11 @@ public class SpeakerBlock extends Block implements EntityBlock, SimpleWaterlogge
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                                  InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer sp) {
+            if (com.broadcast.item.DebuggerItem.findDebugger(sp).getItem()
+                    instanceof com.broadcast.item.DebuggerItem
+                    && com.broadcast.item.DebuggerItem.openFor(sp, pos)) {
+                return InteractionResult.CONSUME;
+            }
             sp.displayClientMessage(net.minecraft.network.chat.Component.translatable(
                     "msg.broadcast.need_debugger"), true);
         }

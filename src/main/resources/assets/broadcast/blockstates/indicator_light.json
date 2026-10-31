@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "broadcast:block/indicator_light_off" },
+    "lit=true": { "model": "broadcast:block/indicator_light_on" }
+  }
+}

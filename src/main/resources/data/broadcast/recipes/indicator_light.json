@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "GRG",
+    " G "
+  ],
+  "key": {
+    "G": { "item": "minecraft:glass" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": {
+    "item": "broadcast:indicator_light",
+    "count": 1
+  }
+}

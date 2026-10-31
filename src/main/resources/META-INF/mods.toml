@@ -11,9 +11,12 @@ credits="如意工作台生成"
 authors="Ruyi Workbench"
 description='''
 校园/车站风格的广播系统:
-挂墙式、吸顶式、落地式三种广播器,按频率连接广播站与话筒;
-广播站支持多频率同步广播、在线音乐/本地上传音乐、原生 MP3 与定时循环;
-话筒拥有独立 GUI(频率/红石模式/讲话暂停音乐),红石驱动实时广播。
+挂墙式、吸顶式、落地式、柱式挂壁四种广播器,按频率连接广播站与话筒;
+广播站支持多频率同步广播、在线音乐/本地上传音乐、原生 MP3 与播放列表;
+话筒/便携式麦克风支持红石、提示音、讲话暂停音乐;调试器打开 GUI(450 耐久);指示灯显示广播状态。
+
+School / railway broadcast system with four speaker types, frequency linking,
+music library + playlists, native MP3, portable microphone, debugger and indicator lights.
 '''
 
 [[dependencies.broadcast]]

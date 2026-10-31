@@ -62,6 +62,7 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
     private String frequency = FrequencyUtil.DEFAULT;
     private RedstoneMode redstoneMode = RedstoneMode.SELF;
     private boolean pauseMusicWhileTalking = true;
+    private boolean startSoundEnabled = true;
 
     @Nullable
     private UUID owner;
@@ -116,6 +117,16 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
             if (pause) pauseStations();
             else resumeStations();
         }
+        setChanged();
+    }
+
+    public boolean isStartSoundEnabled() {
+        return startSoundEnabled;
+    }
+
+    public void setStartSoundEnabled(boolean enabled) {
+        if (enabled == startSoundEnabled) return;
+        startSoundEnabled = enabled;
         setChanged();
     }
 
@@ -226,11 +237,19 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
                 NetworkHandler.sendToPlayer(ownerPlayer, new MicCaptureControlPacket(worldPosition, true,
                         Math.round(getStationVolume() * 100), getOutputSpeakers()));
                 broadcastState();
+                playStartSound();
                 return;
             }
         }
         MicCapture.tryStart(this);
         if (isActive() && pauseMusicWhileTalking) pauseStations();
+        if (isActive()) playStartSound();
+    }
+
+    private void playStartSound() {
+        if (!startSoundEnabled || !(level instanceof ServerLevel sl)) return;
+        sl.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.BELL_BLOCK,
+                net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.6F);
     }
 
     private void stopBroadcast() {
@@ -316,6 +335,7 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
         tag.putString("frequency", frequency);
         tag.putInt("redstoneMode", redstoneMode.ordinal());
         tag.putBoolean("pauseMusic", pauseMusicWhileTalking);
+        tag.putBoolean("startSound", startSoundEnabled);
         if (owner != null) tag.putUUID("owner", owner);
     }
 
@@ -325,6 +345,7 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
         frequency = FrequencyUtil.normalizeOrDefault(tag.getString("frequency"));
         redstoneMode = RedstoneMode.byOrdinal(tag.getInt("redstoneMode"));
         pauseMusicWhileTalking = !tag.contains("pauseMusic") || tag.getBoolean("pauseMusic");
+        startSoundEnabled = !tag.contains("startSound") || tag.getBoolean("startSound");
         if (tag.hasUUID("owner")) owner = tag.getUUID("owner");
         // 红石状态不持久化:世界重新加载后由 serverTick 重新检测
         lastShouldBroadcast = false;

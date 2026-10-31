@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "broadcast:block/column_speaker", "y": 180 },
+    "facing=south": { "model": "broadcast:block/column_speaker" },
+    "facing=east": { "model": "broadcast:block/column_speaker", "y": 270 },
+    "facing=west": { "model": "broadcast:block/column_speaker", "y": 90 }
+  }
+}

@@ -88,7 +88,6 @@ public final class MicCapture {
         mic.setActive(true);
         c.start();
         mic.broadcastState();
-        notifyNear(mic, Component.translatable("msg.broadcast.mic_on").withStyle(ChatFormatting.GREEN));
         BroadcastMod.LOGGER.info("话筒 {} 开始广播(采集格式 {} Hz / {} 声道, 输出 {} 台广播器)",
                 k, (int) format.getSampleRate(), format.getChannels(), mic.getOutputSpeakers().size());
     }

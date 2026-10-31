@@ -21,7 +21,11 @@ public class ModCreativeTab {
                         output.accept(ModBlocks.WALL_SPEAKER.get());
                         output.accept(ModBlocks.CEILING_SPEAKER.get());
                         output.accept(ModBlocks.FLOOR_SPEAKER.get());
+                        output.accept(ModBlocks.COLUMN_SPEAKER.get());
                         output.accept(ModBlocks.MICROPHONE.get());
+                        output.accept(ModBlocks.INDICATOR.get());
+                        output.accept(ModItems.DEBUGGER.get());
+                        output.accept(ModItems.PORTABLE_MICROPHONE.get());
                     })
                     .build());
 }

@@ -1,6 +1,7 @@
 package com.broadcast.network.packet;
 
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
+import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -33,6 +34,12 @@ public record SetPlaylistSettingsPacket(BlockPos station, boolean loop, boolean 
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
             if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+                boolean changed = be.isPlaylistLoop() != p.loop
+                        || be.isPlaylistReverse() != p.reverse
+                        || be.getPlaylistGapSeconds() != p.gapSeconds
+                        || be.getPlaylistTrackSeconds() != p.trackSeconds;
+                if (!changed) return;
+                if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_STATION)) return;
                 be.setPlaylistSettings(p.loop, p.reverse, p.gapSeconds, p.trackSeconds);
                 be.sendInfoTo(player);
             }

@@ -2,6 +2,7 @@ package com.broadcast.registry;
 
 import com.broadcast.BroadcastMod;
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
+import com.broadcast.blockentity.IndicatorLightBlockEntity;
 import com.broadcast.blockentity.MicrophoneBlockEntity;
 import com.broadcast.blockentity.SpeakerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,11 +24,17 @@ public class ModBlockEntities {
                     .of(SpeakerBlockEntity::new,
                             ModBlocks.WALL_SPEAKER.get(),
                             ModBlocks.CEILING_SPEAKER.get(),
-                            ModBlocks.FLOOR_SPEAKER.get())
+                            ModBlocks.FLOOR_SPEAKER.get(),
+                            ModBlocks.COLUMN_SPEAKER.get())
                     .build(null));
 
     public static final RegistryObject<BlockEntityType<MicrophoneBlockEntity>> MICROPHONE =
             BLOCK_ENTITIES.register("microphone", () -> BlockEntityType.Builder
                     .of(MicrophoneBlockEntity::new, ModBlocks.MICROPHONE.get())
+                    .build(null));
+
+    public static final RegistryObject<BlockEntityType<IndicatorLightBlockEntity>> INDICATOR =
+            BLOCK_ENTITIES.register("indicator_light", () -> BlockEntityType.Builder
+                    .of(IndicatorLightBlockEntity::new, ModBlocks.INDICATOR.get())
                     .build(null));
 }

@@ -118,6 +118,11 @@ public class MicrophoneBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                                  InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide && player instanceof net.minecraft.server.level.ServerPlayer sp) {
+            if (com.broadcast.item.DebuggerItem.findDebugger(sp).getItem()
+                    instanceof com.broadcast.item.DebuggerItem
+                    && com.broadcast.item.DebuggerItem.openFor(sp, pos)) {
+                return InteractionResult.CONSUME;
+            }
             sp.displayClientMessage(Component.translatable("msg.broadcast.need_debugger"), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide);

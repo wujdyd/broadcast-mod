@@ -5,6 +5,7 @@ import com.broadcast.blockentity.MicrophoneBlockEntity;
 import com.broadcast.registry.ModItems;
 import com.broadcast.server.MicCapture;
 import com.broadcast.server.MusicLibrary;
+import com.broadcast.server.PortableMicManager;
 import com.broadcast.server.UploadHttpServer;
 import com.broadcast.world.BroadcastRegistryData;
 import net.minecraft.ChatFormatting;
@@ -27,7 +28,11 @@ public class CommonEvents {
             new ResourceLocation("broadcast", "wall_speaker"),
             new ResourceLocation("broadcast", "ceiling_speaker"),
             new ResourceLocation("broadcast", "floor_speaker"),
-            new ResourceLocation("broadcast", "microphone")
+            new ResourceLocation("broadcast", "column_speaker"),
+            new ResourceLocation("broadcast", "microphone"),
+            new ResourceLocation("broadcast", "indicator_light"),
+            new ResourceLocation("broadcast", "debugger"),
+            new ResourceLocation("broadcast", "portable_microphone")
     };
 
     @SubscribeEvent
@@ -39,6 +44,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
         MicCapture.stopAll();
+        PortableMicManager.stopAll();
         UploadHttpServer.stop();
     }
 
@@ -46,6 +52,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        PortableMicManager.onLogout(player);
         if (!(player.level() instanceof ServerLevel level)) return;
         for (BlockPos pos : new ArrayList<>(BroadcastRegistryData.get(level).getMicrophones())) {
             if (!level.isLoaded(pos)) continue;
@@ -68,7 +75,10 @@ public class CommonEvents {
 
     @SubscribeEvent
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) syncStates(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            PortableMicManager.onDimensionChange(player);
+            syncStates(player);
+        }
     }
 
     private static void syncStates(ServerPlayer player) {
@@ -99,10 +109,21 @@ public class CommonEvents {
             event.getToolTip().add(Component.translatable("tooltip.broadcast.ceiling_speaker").withStyle(ChatFormatting.GRAY));
         } else if (item == ModItems.FLOOR_SPEAKER.get()) {
             event.getToolTip().add(Component.translatable("tooltip.broadcast.floor_speaker").withStyle(ChatFormatting.GRAY));
+        } else if (item == ModItems.COLUMN_SPEAKER.get()) {
+            event.getToolTip().add(Component.translatable("tooltip.broadcast.column_speaker").withStyle(ChatFormatting.GRAY));
+        } else if (item == ModItems.INDICATOR_LIGHT.get()) {
+            event.getToolTip().add(Component.translatable("tooltip.broadcast.indicator_light").withStyle(ChatFormatting.GRAY));
         } else if (item == ModItems.MICROPHONE.get()) {
             event.getToolTip().add(Component.translatable("tooltip.broadcast.microphone").withStyle(ChatFormatting.GRAY));
         } else if (item == ModItems.DEBUGGER.get()) {
             event.getToolTip().add(Component.translatable("tooltip.broadcast.debugger").withStyle(ChatFormatting.GRAY));
+            var stack = event.getItemStack();
+            int remaining = stack.getMaxDamage() - stack.getDamageValue();
+            event.getToolTip().add(Component.translatable("tooltip.broadcast.debugger_durability",
+                    remaining, stack.getMaxDamage()).withStyle(ChatFormatting.DARK_AQUA));
+        } else if (item == ModItems.PORTABLE_MICROPHONE.get()) {
+            event.getToolTip().add(Component.translatable("tooltip.broadcast.portable_microphone")
+                    .withStyle(ChatFormatting.GRAY));
         }
     }
 }

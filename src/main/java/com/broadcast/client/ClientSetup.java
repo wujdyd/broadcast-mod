@@ -20,6 +20,8 @@ public class ClientSetup {
                     com.broadcast.client.gui.SpeakerScreen::new);
             MenuScreens.register(ModMenuTypes.MICROPHONE.get(),
                     com.broadcast.client.gui.MicrophoneScreen::new);
+            MenuScreens.register(ModMenuTypes.PORTABLE_MIC.get(),
+                    com.broadcast.client.gui.PortableMicScreen::new);
         });
     }
 }

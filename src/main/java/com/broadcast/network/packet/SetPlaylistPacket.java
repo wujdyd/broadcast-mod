@@ -1,6 +1,7 @@
 package com.broadcast.network.packet;
 
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
+import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -35,6 +36,8 @@ public record SetPlaylistPacket(BlockPos station, List<String> playlist) {
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
             if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+                if (be.getPlaylist().equals(p.playlist)) return;
+                if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_STATION)) return;
                 be.setPlaylist(p.playlist);
                 be.sendInfoTo(player);
             }

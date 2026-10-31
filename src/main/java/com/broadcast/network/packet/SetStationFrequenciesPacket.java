@@ -1,6 +1,7 @@
 package com.broadcast.network.packet;
 
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
+import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
 import com.broadcast.util.FrequencyUtil;
 import net.minecraft.core.BlockPos;
@@ -36,7 +37,10 @@ public record SetStationFrequenciesPacket(BlockPos station, List<String> frequen
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
             if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
-                be.setFrequencies(FrequencyUtil.normalizeList(p.frequencies));
+                var next = FrequencyUtil.normalizeList(p.frequencies);
+                if (next.equals(be.getFrequencies())) return;
+                if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_STATION)) return;
+                be.setFrequencies(next);
                 be.sendInfoTo(player);
             }
         });

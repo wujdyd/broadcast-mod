@@ -24,9 +24,11 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
     private EditBox freqField;
     private UiButton modeButton;
     private UiButton pauseButton;
+    private UiButton soundButton;
     private String lastSent = "";
     private int modeIndex = RedstoneMode.SELF.ordinal();
     private boolean pauseMusic = true;
+    private boolean startSound = true;
     private boolean dirty;
     private int refreshTimer;
 
@@ -44,6 +46,7 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
             lastSent = view.frequency();
             modeIndex = view.redstoneMode();
             pauseMusic = view.pauseMusic();
+            startSound = view.startSound();
         }
 
         freqField = new EditBox(font, leftPos + 16, topPos + 56, W - 32, 18,
@@ -61,7 +64,7 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
                 }, modeIndex == RedstoneMode.ALL.ordinal());
         addRenderableWidget(modeButton);
 
-        pauseButton = new UiButton(leftPos + 16, topPos + 126, W - 32, 18, pauseLabel(),
+        pauseButton = new UiButton(leftPos + 16, topPos + 126, 100, 18, pauseLabel(),
                 b -> {
                     pauseMusic = !pauseMusic;
                     dirty = true;
@@ -69,6 +72,15 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
                     ((UiButton) b).setAccent(pauseMusic);
                 }, pauseMusic);
         addRenderableWidget(pauseButton);
+
+        soundButton = new UiButton(leftPos + 124, topPos + 126, 100, 18, soundLabel(),
+                b -> {
+                    startSound = !startSound;
+                    dirty = true;
+                    b.setMessage(soundLabel());
+                    ((UiButton) b).setAccent(startSound);
+                }, startSound);
+        addRenderableWidget(soundButton);
 
         addRenderableWidget(new UiButton(leftPos + 16, topPos + 198, 100, 18,
                 Component.translatable("gui.broadcast.device.save"), b -> save(), true));
@@ -85,8 +97,13 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
     }
 
     private Component pauseLabel() {
-        return Component.translatable("gui.broadcast.device.pause_music",
+        return Component.translatable("gui.broadcast.device.pause_short",
                 Component.translatable(pauseMusic ? "gui.broadcast.on" : "gui.broadcast.off"));
+    }
+
+    private Component soundLabel() {
+        return Component.translatable("gui.broadcast.device.sound_short",
+                Component.translatable(startSound ? "gui.broadcast.on" : "gui.broadcast.off"));
     }
 
     private void save() {
@@ -99,7 +116,7 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
         freqField.setValue(f);
         lastSent = f;
         dirty = false;
-        NetworkHandler.sendToServer(new SetMicSettingsPacket(menu.pos, f, modeIndex, pauseMusic));
+        NetworkHandler.sendToServer(new SetMicSettingsPacket(menu.pos, f, modeIndex, pauseMusic, startSound));
     }
 
     @Override
@@ -114,10 +131,13 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
         if (!dirty) {
             if (modeIndex != view.redstoneMode()) modeIndex = view.redstoneMode();
             if (pauseMusic != view.pauseMusic()) pauseMusic = view.pauseMusic();
+            if (startSound != view.startSound()) startSound = view.startSound();
             modeButton.setMessage(modeLabel());
             modeButton.setAccent(modeIndex == RedstoneMode.ALL.ordinal());
             pauseButton.setMessage(pauseLabel());
             pauseButton.setAccent(pauseMusic);
+            soundButton.setMessage(soundLabel());
+            soundButton.setAccent(startSound);
             if (freqField.getValue().isEmpty() || freqField.getValue().equals(lastSent)) {
                 freqField.setValue(view.frequency());
                 lastSent = view.frequency();
@@ -149,8 +169,10 @@ public class MicrophoneScreen extends AbstractContainerScreen<MicrophoneMenu> {
         GuiTheme.rr(g, x + 15, y + 55, W - 30, 20, GuiTheme.CARD, GuiTheme.BORDER);
         g.drawString(font, Component.translatable("gui.broadcast.device.redstone_mode_label"),
                 x + 16, y + 80, GuiTheme.DIM, false);
-        g.drawString(font, Component.translatable("gui.broadcast.device.pause_music_label"),
+        g.drawString(font, Component.translatable("gui.broadcast.device.pause_music_label_short"),
                 x + 16, y + 114, GuiTheme.DIM, false);
+        g.drawString(font, Component.translatable("gui.broadcast.device.sound_label_short"),
+                x + 124, y + 114, GuiTheme.DIM, false);
 
         DeviceView view = ClientDataHolder.getDevice(menu.pos);
         GuiTheme.rr(g, x + 16, y + 150, W - 32, 42, GuiTheme.CARD, GuiTheme.BORDER);

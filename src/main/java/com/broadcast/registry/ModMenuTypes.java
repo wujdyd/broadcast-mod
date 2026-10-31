@@ -3,6 +3,7 @@ package com.broadcast.registry;
 import com.broadcast.BroadcastMod;
 import com.broadcast.menu.BroadcastStationMenu;
 import com.broadcast.menu.MicrophoneMenu;
+import com.broadcast.menu.PortableMicMenu;
 import com.broadcast.menu.SpeakerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -25,4 +26,8 @@ public class ModMenuTypes {
     public static final RegistryObject<MenuType<MicrophoneMenu>> MICROPHONE =
             MENUS.register("microphone", () -> IForgeMenuType.create(
                     (windowId, inv, data) -> new MicrophoneMenu(windowId, inv, data)));
+
+    public static final RegistryObject<MenuType<PortableMicMenu>> PORTABLE_MIC =
+            MENUS.register("portable_microphone", () -> IForgeMenuType.create(
+                    (windowId, inv, data) -> new PortableMicMenu(windowId, inv, data)));
 }

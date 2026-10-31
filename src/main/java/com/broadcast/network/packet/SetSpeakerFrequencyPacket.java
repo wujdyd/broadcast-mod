@@ -2,6 +2,7 @@ package com.broadcast.network.packet;
 
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
 import com.broadcast.blockentity.SpeakerBlockEntity;
+import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
 import com.broadcast.util.FrequencyUtil;
 import com.broadcast.world.BroadcastRegistryData;
@@ -36,6 +37,8 @@ public record SetSpeakerFrequencyPacket(BlockPos pos, String frequency) {
                 String f = FrequencyUtil.normalize(p.frequency);
                 if (f.isEmpty()) return;
                 String old = speaker.getFrequency();
+                if (f.equals(old)) return;
+                if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_SPEAKER)) return;
                 speaker.setFrequency(f);
                 // 旧频率/新频率对应的广播站都刷新一次,正在播放时立刻更新出声广播器列表
                 if (player.level() instanceof ServerLevel level) {

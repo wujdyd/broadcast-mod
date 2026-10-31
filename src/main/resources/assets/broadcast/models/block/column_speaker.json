@@ -1,0 +1,76 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "broadcast:block/cabinet",
+    "cabinet": "broadcast:block/cabinet",
+    "grille": "broadcast:block/grille",
+    "metal": "broadcast:block/metal"
+  },
+  "elements": [
+    {
+      "comment": "壁挂底板",
+      "from": [5, 0, 0],
+      "to": [11, 16, 1],
+      "faces": {
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "down": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "柱体",
+      "from": [5.5, 1, 1],
+      "to": [10.5, 15, 4.5],
+      "faces": {
+        "north": { "texture": "#cabinet" },
+        "south": { "texture": "#cabinet" },
+        "east": { "texture": "#cabinet" },
+        "west": { "texture": "#cabinet" },
+        "up": { "texture": "#metal" },
+        "down": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "正面网罩",
+      "from": [5.8, 2, 4.5],
+      "to": [10.2, 14, 5.1],
+      "faces": {
+        "north": { "texture": "#grille" },
+        "south": { "texture": "#grille" },
+        "east": { "texture": "#grille" },
+        "west": { "texture": "#grille" },
+        "up": { "texture": "#grille" },
+        "down": { "texture": "#grille" }
+      }
+    },
+    {
+      "comment": "顶部盖板",
+      "from": [5, 15, 1],
+      "to": [11, 16, 4.8],
+      "faces": {
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "down": { "texture": "#metal" }
+      }
+    },
+    {
+      "comment": "底部盖板",
+      "from": [5, 0, 1],
+      "to": [11, 1.2, 4.8],
+      "faces": {
+        "north": { "texture": "#metal" },
+        "south": { "texture": "#metal" },
+        "east": { "texture": "#metal" },
+        "west": { "texture": "#metal" },
+        "up": { "texture": "#metal" },
+        "down": { "texture": "#metal" }
+      }
+    }
+  ]
+}

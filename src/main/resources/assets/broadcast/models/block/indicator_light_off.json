@@ -1,0 +1,21 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "broadcast:block/indicator_off",
+    "all": "broadcast:block/indicator_off"
+  },
+  "elements": [
+    {
+      "from": [4, 4, 4],
+      "to": [12, 12, 12],
+      "faces": {
+        "down": { "texture": "#all" },
+        "up": { "texture": "#all" },
+        "north": { "texture": "#all" },
+        "south": { "texture": "#all" },
+        "east": { "texture": "#all" },
+        "west": { "texture": "#all" }
+      }
+    }
+  ]
+}

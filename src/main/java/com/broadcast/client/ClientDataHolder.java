@@ -43,7 +43,7 @@ public final class ClientDataHolder {
     }
 
     public record DeviceView(BlockPos pos, String kind, String frequency, boolean powered,
-                             boolean active, int redstoneMode, boolean pauseMusic,
+                             boolean active, int redstoneMode, boolean pauseMusic, boolean startSound,
                              int speakers, int poweredSpeakers, int stations, int volumePercent,
                              int detectionRadius) {
     }

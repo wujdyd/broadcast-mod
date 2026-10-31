@@ -4,8 +4,8 @@ license="MIT"
 
 [[mods]]
 modId="broadcast"
-version="0.0.3br-fix1"
-displayName="广播站 Broadcast 0.0.3br-fix1"
+version="0.0.3br-fix2"
+displayName="广播站 Broadcast 0.0.3br-fix2"
 logoFile="broadcast_logo.png"
 credits="如意工作台生成"
 authors="Ruyi Workbench"

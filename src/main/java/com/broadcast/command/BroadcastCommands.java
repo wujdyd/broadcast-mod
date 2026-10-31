@@ -45,9 +45,8 @@ public final class BroadcastCommands {
                 .then(Commands.literal("band")
                         .executes(BroadcastCommands::listBands)
                         .then(Commands.argument("group", StringArgumentType.word())
-                                .then(Commands.argument("range", RangeArgument.range())
-                                        .then(Commands.argument("english", StringArgumentType.word())
-                                                .executes(BroadcastCommands::setBand)))))
+                                .then(Commands.argument("args", StringArgumentType.greedyString())
+                                        .executes(BroadcastCommands::setBand))))
                 .executes(BroadcastCommands::listCommands));
     }
 
@@ -112,19 +111,25 @@ public final class BroadcastCommands {
             source.sendFailure(Component.translatable("command.broadcast.band_group_invalid"));
             return 0;
         }
-        String raw = StringArgumentType.getString(ctx, "range");
+        String args = StringArgumentType.getString(ctx, "args").trim();
+        int split = args.lastIndexOf(' ');
+        if (split <= 0) {
+            source.sendFailure(Component.translatable("command.broadcast.band_invalid"));
+            return 0;
+        }
+        String raw = args.substring(0, split).trim();
+        String englishRaw = args.substring(split + 1).trim();
         int start;
         int end;
         try {
             String[] parts = raw.split(":", -1);
             if (parts.length != 2) throw new NumberFormatException();
-            start = Integer.parseInt(parts[0]);
-            end = Integer.parseInt(parts[1]);
+            start = Integer.parseInt(parts[0].trim());
+            end = Integer.parseInt(parts[1].trim());
         } catch (Throwable t) {
             source.sendFailure(Component.translatable("command.broadcast.band_invalid"));
             return 0;
         }
-        String englishRaw = StringArgumentType.getString(ctx, "english");
         boolean english;
         if ("yes".equalsIgnoreCase(englishRaw)) english = true;
         else if ("no".equalsIgnoreCase(englishRaw)) english = false;

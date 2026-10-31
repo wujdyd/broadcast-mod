@@ -6,8 +6,8 @@
 
 把两个 jar 都放进 `mods/`：
 
-- `broadcast-0.0.3br-all.jar`（主模组）
-- `broadcast_media_support-1.0.0.jar`（本附属）
+- `broadcast-0.0.3br-fix1-all.jar`（主模组）
+- `broadcast_media_support-1.0.0-fix1.jar`（本附属）
 
 没有安装本附属时，主模组在播放视频链接时会提示：
 
@@ -60,7 +60,7 @@ cd media-support
 ..\tools\gradle-8.1.1\bin\gradle.bat build --no-daemon
 ```
 
-产物：`media-support/build/libs/broadcast_media_support-1.0.0.jar`
+产物：`media-support/build/libs/broadcast_media_support-1.0.0-fix1.jar`
 
 ## 许可
 

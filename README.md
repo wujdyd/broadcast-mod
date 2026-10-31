@@ -1,8 +1,8 @@
 # 广播站 Broadcast（Minecraft 1.20.1 + Forge 模组）
 
-校园 / 火车站风格广播系统模组。当前版本：**0.0.3br**
+校园 / 火车站风格广播系统模组。当前版本：**0.0.3br-fix1**
 
-构建产物：`build/libs/broadcast-0.0.3br-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
+构建产物：`build/libs/broadcast-0.0.3br-fix1-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
 
 ---
 
@@ -21,7 +21,7 @@
 
 ---
 
-## 0.0.3br 更新
+## 0.0.3br-fix1 更新
 
 - 调试器耐久与客户端同步，损坏时播放原版工具损坏音效；物品名称下方不再显示额外小字。
 - 单人 ESC 暂停时挂起 OpenAL 音源，恢复后继续。
@@ -55,16 +55,16 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 产物：
 
-- `build/libs/broadcast-0.0.3br-all.jar` —— **发布用**（含 JLayer/jFLAC）
-- `build/libs/broadcast-0.0.3br.jar` —— 不含内置依赖
-- `media-support/build/libs/broadcast_media_support-1.0.0.jar` —— 视频音频附属（可选）
+- `build/libs/broadcast-0.0.3br-fix1-all.jar` —— **发布用**（含 JLayer/jFLAC）
+- `build/libs/broadcast-0.0.3br-fix1.jar` —— 不含内置依赖
+- `media-support/build/libs/broadcast_media_support-1.0.0-fix1.jar` —— 视频音频附属（可选）
 
 ---
 
 ## 安装
 
 1. Forge 1.20.1（47.x）。
-2. 把 `broadcast-0.0.3br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
+2. 把 `broadcast-0.0.3br-fix1-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
 3. 许可证：jar 内 `LICENSE`（MIT；内置 JLayer 与 jFLAC 为 LGPL-2.1）。
 
 ---
@@ -202,8 +202,8 @@ speakerRadius = 18
 
 安装：
 
-- `broadcast-0.0.3br-all.jar`（主模组）
-- `broadcast_media_support-1.0.0.jar`（附属，放在 `mods/`）
+- `broadcast-0.0.3br-fix1-all.jar`（主模组）
+- `broadcast_media_support-1.0.0-fix1.jar`（附属，放在 `mods/`）
 
 未安装附属时，播放视频链接会提示：
 
@@ -223,10 +223,10 @@ speakerRadius = 18
 
 1. 离线朋友服：服务端 `online-mode=false`；
 2. 正版服：正版账号，且能访问 `sessionserver.mojang.com`；
-3. 客户端与服务端安装同一个 `broadcast-0.0.3br-all.jar`；
+3. 客户端与服务端安装同一个 `broadcast-0.0.3br-fix1-all.jar`；
 4. 局域网由主机账号验证。
 
-网络协议：`0.0.3br2`（版本不一致会被 Forge 拒绝）。
+网络协议：`0.0.3br-fix1`（版本不一致会被 Forge 拒绝）。
 
 ---
 

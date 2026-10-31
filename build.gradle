@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.broadcast'
-version = '0.0.1br'
+version = '0.0.2br'
 
 base {
     archivesName = 'broadcast'

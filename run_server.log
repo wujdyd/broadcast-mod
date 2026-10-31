@@ -1,0 +1,7 @@
+# Gradle 构建内存设置：本机物理内存有限（8GB，且 C 盘空间紧张），
+# 这里刻意压低 JVM 内存，避免 Gradle 守护进程把系统提交内存(system commit)吃光。
+# 如构建时出现 OutOfMemoryError，可临时调大 -Xmx。
+org.gradle.jvmargs=-Xmx1g -XX:MaxMetaspaceSize=384m -Dfile.encoding=UTF-8
+org.gradle.daemon=false
+org.gradle.parallel=false
+org.gradle.workers.max=1

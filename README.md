@@ -1,8 +1,8 @@
 # 广播站 Broadcast（Minecraft 1.20.1 + Forge 模组）
 
-校园 / 火车站风格广播系统模组。当前版本：**0.0.1br**
+校园 / 火车站风格广播系统模组。当前版本：**0.0.2br**
 
-构建产物：`build/libs/broadcast-0.0.1br-all.jar`（内含 MP3 解码器，已 reobf，直接放进 `mods/`）。
+构建产物：`build/libs/broadcast-0.0.2br-all.jar`（内含 MP3 解码器，已 reobf，直接放进 `mods/`）。
 
 ---
 
@@ -37,15 +37,15 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 产物：
 
-- `build/libs/broadcast-0.0.1br-all.jar` —— **发布用**（含 JLayer）
-- `build/libs/broadcast-0.0.1br.jar` —— 不含内置依赖
+- `build/libs/broadcast-0.0.2br-all.jar` —— **发布用**（含 JLayer）
+- `build/libs/broadcast-0.0.2br.jar` —— 不含内置依赖
 
 ---
 
 ## 安装
 
 1. Forge 1.20.1（47.x）。
-2. 把 `broadcast-0.0.1br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
+2. 把 `broadcast-0.0.2br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
 3. 许可证：jar 内 `LICENSE`（MIT；内置 JLayer 为 LGPL-2.1）。
 
 ---
@@ -169,10 +169,10 @@ speakerRadius = 18
 
 1. 离线朋友服：服务端 `online-mode=false`；
 2. 正版服：正版账号，且能访问 `sessionserver.mojang.com`；
-3. 客户端与服务端安装同一个 `broadcast-0.0.1br-all.jar`；
+3. 客户端与服务端安装同一个 `broadcast-0.0.2br-all.jar`；
 4. 局域网由主机账号验证。
 
-网络协议：`0.0.1br2`（版本不一致会被 Forge 拒绝）。
+网络协议：`0.0.2br2`（版本不一致会被 Forge 拒绝）。
 
 ---
 

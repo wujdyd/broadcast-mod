@@ -1,8 +1,8 @@
 # Broadcast Mod (Minecraft 1.20.1 + Forge)
 
-School / railway-station style broadcast system. Version: **0.0.1br**
+School / railway-station style broadcast system. Version: **0.0.2br**
 
-Release jar: `build/libs/broadcast-0.0.1br-all.jar` (bundled MP3 decoder, reobfuscated).
+Release jar: `build/libs/broadcast-0.0.2br-all.jar` (bundled MP3 decoder, reobfuscated).
 
 ## Blocks & Items
 
@@ -72,7 +72,7 @@ Native JLayer decoding, bundled. ID3v2 tags are skipped before decoding; Header 
 
 ## Multiplayer "Invalid session"
 
-That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.1br2`.
+That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.2br2`.
 
 ## License
 

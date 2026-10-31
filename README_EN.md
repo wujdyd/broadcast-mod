@@ -62,6 +62,7 @@ Secondary playlist GUI: loop, forward/reverse, gap, per-track duration; scroll v
 
 - `/? list command`
 - `/? list music`
+- `/? list recipe`
 - `/? delete musichub sure <UID>` (OP)
 - `/? restart`, `/? stopweb`, `/? startweb` (OP)
 

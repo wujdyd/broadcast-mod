@@ -156,6 +156,7 @@
   "command.broadcast.no_permission": "OP permission required",
   "command.broadcast.help.list": "/? list command - list this mod's commands",
   "command.broadcast.help.music": "/? list music - list music UIDs and file names",
+  "command.broadcast.help.recipe": "/? list recipe - list loaded recipes from this mod",
   "command.broadcast.help.delete": "/? delete musichub sure <UID> - delete a track by UID (OP)",
   "command.broadcast.help.restart": "/? restart - restart upload service and rescan library (OP)",
   "command.broadcast.help.stopweb": "/? stopweb - stop the music upload service (OP)",

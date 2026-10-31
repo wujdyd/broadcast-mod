@@ -156,6 +156,7 @@
   "command.broadcast.no_permission": "需要管理员权限(OP)",
   "command.broadcast.help.list": "/? list command - 显示本模组指令",
   "command.broadcast.help.music": "/? list music - 列出音乐库 UID 与文件名",
+  "command.broadcast.help.recipe": "/? list recipe - 列出已加载的本模组配方",
   "command.broadcast.help.delete": "/? delete musichub sure <UID> - 删除指定 UID 的音乐(需要 OP)",
   "command.broadcast.help.restart": "/? restart - 重启上传服务并重扫音乐库(需要 OP)",
   "command.broadcast.help.stopweb": "/? stopweb - 停止音乐上传服务(需要 OP)",

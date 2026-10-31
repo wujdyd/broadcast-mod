@@ -132,6 +132,7 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 | --- | --- | --- |
 | `/? list command` | 列出指令 | 所有人 |
 | `/? list music` | 列出 UID + 文件名 | 所有人 |
+| `/? list recipe` | 列出已加载的本模组配方 | 所有人 |
 | `/? delete musichub sure <UID>` | 删除音乐 | OP |
 | `/? restart` | 重启上传服务 + 重扫音乐库 | OP |
 | `/? stopweb` / `/? startweb` | 停止 / 启动上传服务 | OP |

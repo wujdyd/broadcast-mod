@@ -15,6 +15,7 @@ public final class BroadcastCommands {
     private static final String[] HELP_KEYS = new String[]{
             "command.broadcast.help.list",
             "command.broadcast.help.music",
+            "command.broadcast.help.recipe",
             "command.broadcast.help.delete",
             "command.broadcast.help.restart",
             "command.broadcast.help.stopweb",
@@ -29,7 +30,8 @@ public final class BroadcastCommands {
         dispatcher.register(Commands.literal("?")
                 .then(Commands.literal("list")
                         .then(Commands.literal("command").executes(BroadcastCommands::listCommands))
-                        .then(Commands.literal("music").executes(BroadcastCommands::listMusic)))
+                        .then(Commands.literal("music").executes(BroadcastCommands::listMusic))
+                        .then(Commands.literal("recipe").executes(BroadcastCommands::listRecipes)))
                 .then(Commands.literal("delete")
                         .then(Commands.literal("musichub")
                                 .then(Commands.literal("sure")
@@ -67,6 +69,17 @@ public final class BroadcastCommands {
             ctx.getSource().sendSuccess(() -> Component.literal(entry.uid() + "  " + entry.name()), false);
         }
         return entries.size();
+    }
+
+    private static int listRecipes(CommandContext<CommandSourceStack> ctx) {
+        var recipes = ctx.getSource().getServer().getRecipeManager().getRecipes().stream()
+                .filter(r -> r.getId().getNamespace().equals("broadcast"))
+                .map(r -> r.getId().toString())
+                .sorted()
+                .toList();
+        ctx.getSource().sendSuccess(() -> Component.literal("broadcast recipes (" + recipes.size() + "): "
+                + String.join(", ", recipes)), false);
+        return recipes.size();
     }
 
     private static int deleteMusic(CommandContext<CommandSourceStack> ctx) {

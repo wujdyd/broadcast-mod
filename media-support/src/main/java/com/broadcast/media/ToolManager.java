@@ -84,7 +84,7 @@ final class ToolManager {
                 url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip";
                 zip = true;
             } else if (mac) {
-                url = "https://evermeet.cx/ffmpeg/getrelease/zip";
+                url = macFfmpegUrl();
                 zip = true;
             } else {
                 url = arm
@@ -111,8 +111,21 @@ final class ToolManager {
         return new Tools(yt, ff);
     }
 
-    private static void download(String url, Path target) throws Exception {
-        Path tmp = target.resolveSibling(target.getFileName() + ".part");
+    /** evermeet 的固定 getrelease 入口已失效,改为从 info API 取当前 snapshot zip。 */
+    private static String macFfmpegUrl() throws Exception {
+        HttpRequest request = HttpRequest.newBuilder(URI.create("https://evermeet.cx/ffmpeg/info/ffmpeg/snapshot"))
+                .header("User-Agent", "BroadcastMediaSupport/0.0.3")
+                .timeout(Duration.ofSeconds(60))
+                .GET().build();
+        String json = HTTP.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("\"zip\"\\s*:\\s*\\{[^}]*?\"url\"\\s*:\\s*\"([^\"]+)\"", java.util.regex.Pattern.DOTALL)
+                .matcher(json);
+        if (!m.find()) throw new IllegalStateException("无法获取 macOS ffmpeg 下载地址");
+        return m.group(1).replace("\\/", "/");
+    }
+
+    private static void download(String url, Path target) throws Exception {        Path tmp = target.resolveSibling(target.getFileName() + ".part");
         Files.deleteIfExists(tmp);
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
                 .header("User-Agent", "BroadcastMediaSupport/0.0.3")

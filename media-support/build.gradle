@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.broadcast.media'
-version = '0.0.3br'
+version = '1.0.0'
 
 base {
     archivesName = 'broadcast_media_support'

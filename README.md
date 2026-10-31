@@ -57,7 +57,7 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 - `build/libs/broadcast-0.0.3br-all.jar` —— **发布用**（含 JLayer/jFLAC）
 - `build/libs/broadcast-0.0.3br.jar` —— 不含内置依赖
-- `media-support/build/libs/broadcast_media_support-0.0.3br.jar` —— 视频音频附属（可选）
+- `media-support/build/libs/broadcast_media_support-1.0.0.jar` —— 视频音频附属（可选）
 
 ---
 
@@ -203,7 +203,7 @@ speakerRadius = 18
 安装：
 
 - `broadcast-0.0.3br-all.jar`（主模组）
-- `broadcast_media_support-0.0.3br.jar`（附属，放在 `mods/`）
+- `broadcast_media_support-1.0.0.jar`（附属，放在 `mods/`）
 
 未安装附属时，播放视频链接会提示：
 

@@ -89,7 +89,7 @@ Video links are handled by the separate **Broadcast Media Support** addon; the m
 Install both:
 
 - `broadcast-0.0.3br-all.jar`
-- `broadcast_media_support-0.0.3br.jar`
+- `broadcast_media_support-1.0.0.jar`
 
 Without the addon the main mod reports exactly: `未安装broadcast media support，无法播放`.
 

@@ -3,6 +3,7 @@ package com.broadcast.network.packet;
 import com.broadcast.blockentity.MicrophoneBlockEntity;
 import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
+import com.broadcast.util.FrequencyBandManager;
 import com.broadcast.util.FrequencyUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -37,6 +38,11 @@ public record SetMicSettingsPacket(BlockPos pos, String frequency, int redstoneM
             if (player.level().getBlockEntity(p.pos) instanceof MicrophoneBlockEntity mic) {
                 String f = FrequencyUtil.normalize(p.frequency);
                 if (f.isEmpty()) return;
+                if (!FrequencyBandManager.canUse(player, f)) {
+                    player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                            "msg.broadcast.freq_forbidden"), true);
+                    return;
+                }
                 MicrophoneBlockEntity.RedstoneMode mode =
                         MicrophoneBlockEntity.RedstoneMode.byOrdinal(p.redstoneMode);
                 boolean changed = !f.equals(mic.getFrequency())

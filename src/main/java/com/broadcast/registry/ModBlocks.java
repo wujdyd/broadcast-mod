@@ -56,7 +56,7 @@ public class ModBlocks {
                             .mapColor(MapColor.COLOR_RED)
                             .strength(0.5F, 1.0F)
                             .sound(SoundType.GLASS)
-                            .lightLevel(state -> state.getValue(IndicatorLightBlock.LIT) ? 15 : 0)
+                            .lightLevel(state -> state.getValue(IndicatorLightBlock.LIT) ? 5 : 0)
                             .noOcclusion()));
 
     private static BlockBehaviour.Properties baseSpeakerProps() {

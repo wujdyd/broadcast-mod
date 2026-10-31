@@ -35,6 +35,6 @@ public final class NameUtil {
 
     public static boolean isPlayableExtension(String name) {
         String ext = extension(name);
-        return ext.equals("ogg") || ext.equals("wav") || ext.equals("mp3");
+        return ext.equals("ogg") || ext.equals("wav") || ext.equals("mp3") || ext.equals("flac");
     }
 }

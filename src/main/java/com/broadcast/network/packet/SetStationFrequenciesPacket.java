@@ -3,6 +3,7 @@ package com.broadcast.network.packet;
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
 import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
+import com.broadcast.util.FrequencyBandManager;
 import com.broadcast.util.FrequencyUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -38,6 +39,13 @@ public record SetStationFrequenciesPacket(BlockPos station, List<String> frequen
             if (!Access.canControl(player, p.station)) return;
             if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
                 var next = FrequencyUtil.normalizeList(p.frequencies);
+                for (String f : next) {
+                    if (!FrequencyBandManager.canUse(player, f)) {
+                        player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                                "msg.broadcast.freq_forbidden"), true);
+                        return;
+                    }
+                }
                 if (next.equals(be.getFrequencies())) return;
                 if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_STATION)) return;
                 be.setFrequencies(next);

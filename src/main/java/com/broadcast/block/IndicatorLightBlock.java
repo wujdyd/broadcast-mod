@@ -20,7 +20,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 /**
- * 广播指示灯:可以放在任意位置(不需要支撑),当同维度有话筒广播或广播站播放时亮起。
+ * 广播指示灯:放置位置不限。用调试器右键指示灯,再右键广播站/广播器/话筒即可连接;
+ * 只有被连接设备广播时亮起,亮度 5。
  */
 public class IndicatorLightBlock extends Block implements EntityBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;

@@ -44,6 +44,7 @@ public final class ClientAudioManager {
     private static final Map<BlockPos, MusicSession> MUSIC = new HashMap<>();
     private static final Map<BlockPos, MicSink> MICS = new HashMap<>();
     private static boolean alBroken;
+    private static boolean paused;
     private static ResourceKey<Level> lastDimension;
 
     private ClientAudioManager() {
@@ -51,10 +52,11 @@ public final class ClientAudioManager {
 
     // ---------- 对外接口 ----------
 
-    public static void startMusic(BlockPos station, String target, boolean url, float volume, List<BlockPos> speakers) {
+    public static void startMusic(BlockPos station, String target, boolean url, boolean loop,
+                                  float volume, List<BlockPos> speakers) {
         stopMusic(station);
         if (speakers.isEmpty()) return;
-        MusicSession s = new MusicSession(station, target, url, volume, speakers);
+        MusicSession s = new MusicSession(station, target, url, loop, volume, speakers);
         MusicSession old = MUSIC.put(station, s);
         if (old != null) old.stop();
         s.start();
@@ -79,6 +81,18 @@ public final class ClientAudioManager {
         if (s != null) s.volume = volume;
     }
 
+    /**
+     * 同一广播站、同一曲目/URL 时只更新广播器列表,不重建会话,因此新增喇叭不会重置进度。
+     */
+    public static boolean updateMusic(BlockPos station, String target, boolean url, boolean loop,
+                                      float volume, List<BlockPos> speakers) {
+        MusicSession s = MUSIC.get(station);
+        if (s == null || !s.target.equals(target) || s.url != url || s.loop != loop) return false;
+        s.volume = volume;
+        s.updateSpeakers(speakers);
+        return true;
+    }
+
     public static void startMic(BlockPos mic, float volume, List<BlockPos> speakers) {
         stopMic(mic);
         if (speakers.isEmpty()) return;
@@ -100,6 +114,7 @@ public final class ClientAudioManager {
         MUSIC.clear();
         MICS.values().forEach(MicSink::close);
         MICS.clear();
+        paused = false;
     }
 
     /** 客户端主线程每 tick 调用:灌入缓冲区并播放。 */
@@ -116,11 +131,65 @@ public final class ClientAudioManager {
             } else {
                 lastDimension = null;
             }
+            // 单人 ESC 暂停时挂起 OpenAL 音源;恢复后继续,不丢会话
+            if (mc.isPaused()) {
+                if (!paused) {
+                    pauseAllSources();
+                    paused = true;
+                }
+                return;
+            }
+            if (paused) {
+                paused = false;
+                resumeAllSources();
+            }
             MUSIC.values().forEach(MusicSession::tick);
             MICS.values().forEach(MicSink::tick);
         } catch (Throwable t) {
             alBroken = true;
             BroadcastMod.LOGGER.warn("客户端音频输出不可用,已停用广播声音: {}", t.getMessage());
+        }
+    }
+
+    private static void pauseAllSources() {
+        for (MusicSession s : MUSIC.values()) {
+            for (Src src : s.sources) {
+                try {
+                    AL10.alSourcePause(src.id);
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+        for (MicSink s : MICS.values()) {
+            for (Src src : s.sources) {
+                try {
+                    AL10.alSourcePause(src.id);
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+    }
+
+    private static void resumeAllSources() {
+        for (MusicSession s : MUSIC.values()) {
+            for (Src src : s.sources) {
+                if (src.queued > 0) {
+                    try {
+                        AL10.alSourcePlay(src.id);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
+        }
+        for (MicSink s : MICS.values()) {
+            for (Src src : s.sources) {
+                if (src.queued > 0) {
+                    try {
+                        AL10.alSourcePlay(src.id);
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
         }
     }
 
@@ -205,6 +274,7 @@ public final class ClientAudioManager {
         final BlockPos station;
         final String target;
         final boolean url;
+        final boolean loop;
         List<BlockPos> speakers;
         volatile float volume;
         volatile boolean running = true;
@@ -220,10 +290,11 @@ public final class ClientAudioManager {
         volatile Thread feeder;
         byte[] pendingChunk;
 
-        MusicSession(BlockPos station, String target, boolean url, float volume, List<BlockPos> speakers) {
+        MusicSession(BlockPos station, String target, boolean url, boolean loop, float volume, List<BlockPos> speakers) {
             this.station = station;
             this.target = target;
             this.url = url;
+            this.loop = loop;
             this.volume = volume;
             this.speakers = speakers;
             this.sources = openSources(speakers);
@@ -239,6 +310,36 @@ public final class ClientAudioManager {
             t.setDaemon(true);
             feeder = t;
             t.start();
+        }
+
+        /** 新增/移除喇叭时复用现有解码线程与已排队音频,不重置播放进度。 */
+        void updateSpeakers(List<BlockPos> next) {
+            List<Src> removed = new ArrayList<>();
+            for (Src src : sources) {
+                if (!next.contains(src.pos)) removed.add(src);
+            }
+            for (Src src : removed) {
+                sources.remove(src);
+                closeSource(src);
+            }
+            for (BlockPos pos : next) {
+                boolean exists = sources.stream().anyMatch(s -> s.pos.equals(pos));
+                if (!exists) sources.addAll(openSources(List.of(pos)));
+            }
+            speakers = new ArrayList<>(next);
+        }
+
+        private void closeSource(Src src) {
+            try {
+                AL10.alSourceStop(src.id);
+                while (src.queued > 0) {
+                    int b = AL10.alSourceUnqueueBuffers(src.id);
+                    AL10.alDeleteBuffers(b);
+                    src.queued--;
+                }
+                AL10.alDeleteSources(src.id);
+            } catch (Throwable ignored) {
+            }
         }
 
         void stop() {
@@ -265,7 +366,15 @@ public final class ClientAudioManager {
                     }
                     byte[] chunk = decoder.readChunk(CHUNK_BYTES);
                     if (chunk == null) {
-                        // 一曲结束,循环播放
+                        if (!loop) {
+                            // 播放列表单曲:通知服务端切下一首,不在这里循环
+                            Minecraft.getInstance().execute(() ->
+                                    NetworkHandler.sendToServer(
+                                            new com.broadcast.network.packet.MusicTrackEndPacket(station)));
+                            running = false;
+                            break;
+                        }
+                        // 普通音乐循环播放
                         try {
                             decoder.close();
                         } catch (Exception ignored) {

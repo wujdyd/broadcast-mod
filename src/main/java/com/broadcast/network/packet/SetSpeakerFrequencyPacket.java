@@ -4,6 +4,7 @@ import com.broadcast.blockentity.BroadcastStationBlockEntity;
 import com.broadcast.blockentity.SpeakerBlockEntity;
 import com.broadcast.item.DebuggerItem;
 import com.broadcast.util.Access;
+import com.broadcast.util.FrequencyBandManager;
 import com.broadcast.util.FrequencyUtil;
 import com.broadcast.world.BroadcastRegistryData;
 import net.minecraft.core.BlockPos;
@@ -36,6 +37,11 @@ public record SetSpeakerFrequencyPacket(BlockPos pos, String frequency) {
             if (player.level().getBlockEntity(p.pos) instanceof SpeakerBlockEntity speaker) {
                 String f = FrequencyUtil.normalize(p.frequency);
                 if (f.isEmpty()) return;
+                if (!FrequencyBandManager.canUse(player, f)) {
+                    player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                            "msg.broadcast.freq_forbidden"), true);
+                    return;
+                }
                 String old = speaker.getFrequency();
                 if (f.equals(old)) return;
                 if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_SPEAKER)) return;

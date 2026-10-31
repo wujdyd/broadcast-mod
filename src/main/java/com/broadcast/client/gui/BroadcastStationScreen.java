@@ -474,6 +474,8 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
     private void drawUrlTab(GuiGraphics g, int x, int y, int mx, int my) {
         g.drawString(font, Component.translatable("gui.broadcast.url_hint"), x + 12, y + 58, GuiTheme.DIM, false);
         GuiTheme.rr(g, x + 11, y + 69, 258, 20, GuiTheme.CARD, GuiTheme.BORDER);
+        g.drawString(font, Component.translatable("gui.broadcast.url_video_hint"),
+                x + 12, y + 100, GuiTheme.FAINT, false);
         g.drawString(font, Component.translatable("gui.broadcast.url_history"), x + 12, y + 122, GuiTheme.ORANGE, false);
 
         int hx = x + 12, hy = y + 134, hw = 256, hh = 64;

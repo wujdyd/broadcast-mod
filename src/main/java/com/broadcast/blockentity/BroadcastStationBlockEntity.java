@@ -52,7 +52,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     private boolean playlistLoop;
     private boolean playlistReverse;
     private int playlistGapSeconds = 60;
-    private int playlistTrackSeconds = 30;
+    private int playlistTrackSeconds = 600;
     private int playlistIndex;
     /** 0 = 间隔等待;1 = 正在播放列表曲目 */
     private int playlistPhase;
@@ -246,7 +246,14 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
 
     public List<BlockPos> getSpeakers() {
         if (level instanceof ServerLevel sl) {
-            return BroadcastRegistryData.get(sl).speakersFor(sl, frequencies);
+            List<BlockPos> all = BroadcastRegistryData.get(sl).speakersFor(sl, frequencies);
+            List<BlockPos> out = new ArrayList<>(all.size());
+            for (BlockPos pos : all) {
+                if (sl.getBlockEntity(pos) instanceof SpeakerBlockEntity speaker && !speaker.isMuted()) {
+                    out.add(pos);
+                }
+            }
+            return out;
         }
         return List.of();
     }
@@ -266,17 +273,29 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     // ---------- 播放控制 ----------
 
     public void startPlayback(String target, boolean isUrl) {
+        startPlayback(target, isUrl, false);
+    }
+
+    private void startPlayback(String target, boolean isUrl, boolean playlistTrack) {
         this.target = target;
         this.targetIsUrl = isUrl;
         this.playing = true;
-        this.playlistActive = false;
+        this.playlistActive = playlistTrack;
         setChanged();
         broadcastState();
     }
 
     private void playPlaylistTrack(String name) {
-        startPlayback(name, false);
-        playlistActive = true;
+        startPlayback(name, false, true);
+    }
+
+    /** 播放列表当前曲目自然结束:切到间隔,再由 tickPlaylist 播放下一首。 */
+    public void onTrackEnded() {
+        if (!playlistActive || !playing) return;
+        stopPlayback();
+        playlistPhase = 0;
+        if (level != null) playlistPhaseStart = level.getGameTime();
+        broadcastInfo();
     }
 
     public void stopPlayback() {
@@ -341,7 +360,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     /** 当前播放状态(供 GUI 打开时同步)。 */
     public PlaybackStatePacket statePacket() {
         return new PlaybackStatePacket(worldPosition, playing, target, targetIsUrl,
-                Math.round(volume * 100), getSpeakers());
+                !playlistActive, Math.round(volume * 100), getSpeakers());
     }
 
     public StationInfoPacket infoPacket() {
@@ -458,7 +477,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
         playlistLoop = tag.getBoolean("playlistLoop");
         playlistReverse = tag.getBoolean("playlistReverse");
         playlistGapSeconds = tag.contains("playlistGap") ? tag.getInt("playlistGap") : 60;
-        playlistTrackSeconds = tag.contains("playlistTrackSeconds") ? tag.getInt("playlistTrackSeconds") : 30;
+        playlistTrackSeconds = tag.contains("playlistTrackSeconds") ? tag.getInt("playlistTrackSeconds") : 600;
         playlistIndex = tag.getInt("playlistIndex");
 
         frequencies.clear();

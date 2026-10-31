@@ -1,8 +1,8 @@
 # 广播站 Broadcast（Minecraft 1.20.1 + Forge 模组）
 
-校园 / 火车站风格广播系统模组。当前版本：**0.0.2br**
+校园 / 火车站风格广播系统模组。当前版本：**0.0.3br**
 
-构建产物：`build/libs/broadcast-0.0.2br-all.jar`（内含 MP3 解码器，已 reobf，直接放进 `mods/`）。
+构建产物：`build/libs/broadcast-0.0.3br-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
 
 ---
 
@@ -17,7 +17,25 @@
 | 广播调试器 | 唯一打开各 GUI 的工具；450 点耐久；可合成 |
 | 广播指示灯 | 任意位置可放，当同维度有话筒/广播站广播时亮起 |
 
-其他：频率制、多频率同步、音乐搜索、音乐 UID、删除确认、定时播放列表（二级 GUI）、原生 MP3、可配置声音半径、配方书自动解锁。
+其他：频率制、多频率同步、音乐搜索、音乐 UID、删除确认、定时播放列表（二级 GUI）、原生 MP3/FLAC、网络视频音频、音频字幕、可配置声音半径、配方书自动解锁。
+
+---
+
+## 0.0.3br 更新
+
+- 调试器耐久与客户端同步，损坏时播放原版工具损坏音效；物品名称下方不再显示额外小字。
+- 单人 ESC 暂停时挂起 OpenAL 音源，恢复后继续。
+- 播放中新增同频率广播器只追加音源，不重置播放进度。
+- 播放列表改为真实曲目结束驱动（客户端播放完当前曲目后通知服务端切歌）；二级 GUI 固定显示“正在播放”，下方“将要播放”每页 5 首，页数不限。
+- 支持 FLAC（内置 jFLAC，8/16 bit）。
+- 网络音乐页支持视频链接：服务器安装 `yt-dlp` 与 `ffmpeg` 后，可解析 B站/抖音/快手/YouTube/TikTok 等平台并转成音频播放。
+- 播放时 HUD 底部显示音频字幕（曲名 / 话筒广播中）。
+- 指示灯改为连接式：调试器右键指示灯，再右键广播站/广播器/话筒；选择与连接瞬间有粒子，完成后无粒子，亮度 5，连接不耗耐久。
+- 话筒提示音在采集初始化前播放；服务端话筒不可用时自动回退到玩家客户端采集；失败消息只发给广播器附近玩家。
+- 便携式话筒可使用 300 格内的同频广播器。
+- 权限组频率段（默认）：普通 0-40 纯数字；OP2 41-100 纯数字；OP3 任意（含英文）。可用 `/? band` 调整。
+- 干扰：OP3 放置的广播器 100 格内压制其他权限广播器；OP2 放置的广播器 100 格内压制普通玩家广播器。
+
 
 ---
 
@@ -37,16 +55,16 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 产物：
 
-- `build/libs/broadcast-0.0.2br-all.jar` —— **发布用**（含 JLayer）
-- `build/libs/broadcast-0.0.2br.jar` —— 不含内置依赖
+- `build/libs/broadcast-0.0.3br-all.jar` —— **发布用**（含 JLayer）
+- `build/libs/broadcast-0.0.3br.jar` —— 不含内置依赖
 
 ---
 
 ## 安装
 
 1. Forge 1.20.1（47.x）。
-2. 把 `broadcast-0.0.2br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
-3. 许可证：jar 内 `LICENSE`（MIT；内置 JLayer 为 LGPL-2.1）。
+2. 把 `broadcast-0.0.3br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
+3. 许可证：jar 内 `LICENSE`（MIT；内置 JLayer 与 jFLAC 为 LGPL-2.1）。
 
 ---
 
@@ -117,7 +135,8 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 ### 播放列表（二级 GUI）
 
-左侧音乐库、右侧播放列表；`>`/`<` 添加/移除；循环、顺序/逆序、间隔、每首时长；数值框滚轮调整（类机械动力）。旧版固定定时循环已废弃。
+左侧音乐库、右侧播放列表；`>`/`<` 添加/移除；循环、顺序/逆序、间隔、最长单首时长；数值框滚轮调整（类机械动力）。旧版固定定时循环已废弃。
+“正在播放”固定显示当前曲目；“将要播放”每页 5 首，可翻任意页。
 
 ### 上传音乐
 
@@ -133,6 +152,7 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 | `/? list command` | 列出指令 | 所有人 |
 | `/? list music` | 列出 UID + 文件名 | 所有人 |
 | `/? list recipe` | 列出已加载的本模组配方 | 所有人 |
+| `/? band <max\|cr\|su> <起始:终了> <yes\|no>` | 设置权限组频率段（OP3） | OP3 |
 | `/? delete musichub sure <UID>` | 删除音乐 | OP |
 | `/? restart` | 重启上传服务 + 重扫音乐库 | OP |
 | `/? stopweb` / `/? startweb` | 停止 / 启动上传服务 | OP |
@@ -140,6 +160,16 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 > `/? give TSQ` 已取消；调试器请用配方合成。
 
 ---
+
+## 频率权限与干扰
+
+默认频率段：
+
+- 普通玩家（su）：0-40，仅纯数字
+- OP2（cr）：41-100，仅纯数字
+- OP3（max）：0-999999999，可用英文
+
+`/? band su 0:40 no`、`/? band cr 41:100 no`、`/? band max 0:999999999 yes` 可调整并保存到 `world/broadcast_bands.json`；su/cr 频率段不能交叉（max 为无限制组）。
 
 ## 配置
 
@@ -159,6 +189,11 @@ detectionRadius = 10
 
 [audio]
 speakerRadius = 18
+
+[video]
+enabled = true
+ytdlp = "yt-dlp"
+ffmpeg = "ffmpeg"
 ```
 
 ---
@@ -169,10 +204,10 @@ speakerRadius = 18
 
 1. 离线朋友服：服务端 `online-mode=false`；
 2. 正版服：正版账号，且能访问 `sessionserver.mojang.com`；
-3. 客户端与服务端安装同一个 `broadcast-0.0.2br-all.jar`；
+3. 客户端与服务端安装同一个 `broadcast-0.0.3br-all.jar`；
 4. 局域网由主机账号验证。
 
-网络协议：`0.0.2br2`（版本不一致会被 Forge 拒绝）。
+网络协议：`0.0.3br2`（版本不一致会被 Forge 拒绝）。
 
 ---
 

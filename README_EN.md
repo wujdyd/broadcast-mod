@@ -1,8 +1,19 @@
 # Broadcast Mod (Minecraft 1.20.1 + Forge)
 
-School / railway-station style broadcast system. Version: **0.0.2br**
+School / railway-station style broadcast system. Version: **0.0.3br**
 
-Release jar: `build/libs/broadcast-0.0.2br-all.jar` (bundled MP3 decoder, reobfuscated).
+Release jar: `build/libs/broadcast-0.0.3br-all.jar` (bundled MP3/FLAC decoder, reobfuscated).
+
+## 0.0.3br Highlights
+
+- Debugger durability is synced like a vanilla tool; no extra item tooltip lines.
+- ESC pause suspends OpenAL sources; adding a same-frequency speaker no longer restarts playback.
+- Real playlist progression via client track-end; secondary GUI pins "Now playing" and shows 5 "Up next" per page with unlimited pages.
+- FLAC support (jFLAC, 8/16-bit).
+- Video links (Bilibili, Douyin, Kuaishou, YouTube, TikTok, etc.) can be resolved to audio by server-side `yt-dlp` + `ffmpeg`.
+- Audio subtitle HUD; connected indicator light (brightness 5, particles only while linking).
+- Microphone fallback capture + chime before capture; 300-block portable mic range; failure messages near speakers.
+- Frequency permission bands and 100-block OP3/OP2 interference rules (`/? band`).
 
 ## Blocks & Items
 
@@ -63,6 +74,7 @@ Secondary playlist GUI: loop, forward/reverse, gap, per-track duration; scroll v
 - `/? list command`
 - `/? list music`
 - `/? list recipe`
+- `/? band <max|cr|su> <start:end> <yes|no>` (OP3)
 - `/? delete musichub sure <UID>` (OP)
 - `/? restart`, `/? stopweb`, `/? startweb` (OP)
 
@@ -72,7 +84,7 @@ Native JLayer decoding, bundled. ID3v2 tags are skipped before decoding; Header 
 
 ## Multiplayer "Invalid session"
 
-That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.2br2`.
+That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.3br2`.
 
 ## License
 

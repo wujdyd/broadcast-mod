@@ -33,7 +33,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetworkHandler {
-    private static final String PROTOCOL = "0.0.2br2";
+    private static final String PROTOCOL = "0.0.3br2";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BroadcastMod.MODID, "main"),
@@ -48,6 +48,10 @@ public class NetworkHandler {
         CHANNEL.messageBuilder(StopPlaybackPacket.class, id++)
                 .encoder(StopPlaybackPacket::encode).decoder(StopPlaybackPacket::decode)
                 .consumerMainThread(StopPlaybackPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.MusicTrackEndPacket.class, id++)
+                .encoder(com.broadcast.network.packet.MusicTrackEndPacket::encode)
+                .decoder(com.broadcast.network.packet.MusicTrackEndPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.MusicTrackEndPacket::handle).add();
         CHANNEL.messageBuilder(SetSettingsPacket.class, id++)
                 .encoder(SetSettingsPacket::encode).decoder(SetSettingsPacket::decode)
                 .consumerMainThread(SetSettingsPacket::handle).add();

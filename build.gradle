@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.broadcast'
-version = '0.0.2br'
+version = '0.0.3br'
 
 base {
     archivesName = 'broadcast'
@@ -57,6 +57,12 @@ dependencies {
     jarJar(group: 'com.googlecode.soundlibs', name: 'jlayer', version: '[1.0.1.4,1.0.1.5)') {
         jarJar.pin(it, '1.0.1.4')
         exclude group: 'junit', module: 'junit'
+    }
+
+    // FLAC 解码器(纯 Java, LGPL-2.1)
+    implementation 'org.jflac:jflac-codec:1.5.2'
+    jarJar(group: 'org.jflac', name: 'jflac-codec', version: '[1.5.2,1.5.3)') {
+        jarJar.pin(it, '1.5.2')
     }
 }
 

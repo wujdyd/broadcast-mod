@@ -53,7 +53,11 @@ public record PlayRequestPacket(BlockPos station, String target, boolean url, in
                             .withStyle(ChatFormatting.RED), false);
                     return;
                 }
-                be.startPlayback(target, true);
+                if (com.broadcast.server.VideoAudioResolver.isVideoUrl(target)) {
+                    com.broadcast.server.VideoAudioResolver.resolve(player, p.station, target);
+                } else {
+                    be.startPlayback(target, true);
+                }
             } else {
                 String name = NameUtil.sanitizeFileName(target);
                 if (!UploadHttpServer.hasMusicFile(name)) {

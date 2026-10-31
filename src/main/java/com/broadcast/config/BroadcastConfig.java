@@ -17,6 +17,9 @@ public class BroadcastConfig {
     public static final ForgeConfigSpec.ConfigValue<String> MIC_CAPTURE;
     public static final ForgeConfigSpec.IntValue MIC_DETECTION_RADIUS;
     public static final ForgeConfigSpec.IntValue SPEAKER_RADIUS;
+    public static final ForgeConfigSpec.BooleanValue VIDEO_ENABLED;
+    public static final ForgeConfigSpec.ConfigValue<String> VIDEO_YTDLP;
+    public static final ForgeConfigSpec.ConfigValue<String> VIDEO_FFMPEG;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -48,6 +51,15 @@ public class BroadcastConfig {
         b.push("audio");
         SPEAKER_RADIUS = b.comment("广播器声音可听半径(格):超出后完全听不到;建议 15~20,可设 4~64")
                 .defineInRange("speakerRadius", 18, 4, 64);
+        b.pop();
+
+        b.comment("网络视频音频解析(需要服务器安装 yt-dlp 与 ffmpeg)").push("video");
+        VIDEO_ENABLED = b.comment("是否允许解析 B站/抖音/快手/YouTube/TikTok 等视频链接")
+                .define("enabled", true);
+        VIDEO_YTDLP = b.comment("yt-dlp 可执行文件路径(默认从 PATH 查找)")
+                .define("ytdlp", "yt-dlp");
+        VIDEO_FFMPEG = b.comment("ffmpeg 可执行文件路径(默认从 PATH 查找)")
+                .define("ffmpeg", "ffmpeg");
         b.pop();
 
         SPEC = b.build();
@@ -84,6 +96,18 @@ public class BroadcastConfig {
 
     public static int micDetectionRadius() {
         return MIC_DETECTION_RADIUS.get();
+    }
+
+    public static boolean videoEnabled() {
+        return VIDEO_ENABLED.get();
+    }
+
+    public static String ytDlp() {
+        return VIDEO_YTDLP.get();
+    }
+
+    public static String ffmpeg() {
+        return VIDEO_FFMPEG.get();
     }
 
     /** 按配置决定当前服务器是否应使用客户端采集。 */

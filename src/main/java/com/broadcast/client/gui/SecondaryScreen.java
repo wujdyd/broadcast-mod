@@ -30,7 +30,7 @@ public class SecondaryScreen extends Screen {
     private int selectedLibrary = -1;
     private int selectedPlaylist = -1;
     private int libraryScroll;
-    private int playlistScroll;
+    private int playlistPage;
     private int gapValue = 60;
     private int trackValue = 30;
     private long lastValueSend;
@@ -144,6 +144,27 @@ public class SecondaryScreen extends Screen {
         return idx >= 0 && idx < view.music().size() ? view.music().get(idx) : uid;
     }
 
+    /** 播放列表当前曲目:服务端 playlistIndex 指向“下一首”,播放中时当前曲目在反方向。 */
+    private int currentIndex(StationView view) {
+        if (view == null || view.playlist().isEmpty() || !view.playlistPlaying()) return -1;
+        int size = view.playlist().size();
+        return view.playlistReverse()
+                ? (view.playlistIndex() + 1) % size
+                : (view.playlistIndex() - 1 + size) % size;
+    }
+
+    private int pageCount(StationView view) {
+        if (view == null || view.playlist().isEmpty()) return 1;
+        return Math.max(1, (view.playlist().size() + 4) / 5);
+    }
+
+    private int upcomingIndex(StationView view, int slot) {
+        int size = view.playlist().size();
+        int step = view.playlistReverse() ? -1 : 1;
+        int offset = playlistPage * 5 + slot;
+        return Math.floorMod(view.playlistIndex() + step * offset, size);
+    }
+
     // ---------- 渲染 ----------
 
     @Override
@@ -197,33 +218,49 @@ public class SecondaryScreen extends Screen {
         }
         drawScrollbar(g, lx + lw - 5, ly + 20, lh - 24, view.music().size(), visible, libraryScroll);
 
-        // 播放列表
+        // 播放列表:正在播放固定显示 + 将要播放每页 5 个,页数不设上限
         int px = x + 194, py = y + 50, pw = 152, ph = 142;
         GuiTheme.rr(g, px, py, pw, ph, GuiTheme.CARD, GuiTheme.BORDER);
-        g.drawString(font, Component.translatable("gui.broadcast.playlist.list",
-                view.playlist().size()), px + 8, py + 6, GuiTheme.TEXT, false);
-        g.drawString(font, view.playlistReverse() ? "↓" : "↑", px + pw - 18, py + 6,
-                GuiTheme.ORANGE, false);
-        g.fill(px + 8, py + 17, px + pw - 8, py + 18, GuiTheme.BORDER);
+        g.drawString(font, Component.translatable("gui.broadcast.playlist.now_playing"),
+                px + 8, py + 6, GuiTheme.TEXT, false);
+        int current = currentIndex(view);
+        String currentName = current >= 0
+                ? GuiTheme.trim(nameForUid(view, view.playlist().get(current)), 15)
+                : Component.translatable("gui.broadcast.playlist.no_current").getString();
+        g.drawString(font, currentName, px + 8, py + 18,
+                current >= 0 ? GuiTheme.GREEN : GuiTheme.FAINT, false);
+        g.fill(px + 8, py + 31, px + pw - 8, py + 32, GuiTheme.BORDER);
+
+        g.drawString(font, Component.translatable("gui.broadcast.playlist.up_next"),
+                px + 8, py + 36, GuiTheme.TEXT, false);
+        int pages = pageCount(view);
+        playlistPage = Mth.clamp(playlistPage, 0, pages - 1);
+        g.drawString(font, (playlistPage + 1) + "/" + pages, px + pw - 34, py + 36,
+                GuiTheme.FAINT, false);
+
         if (view.playlist().isEmpty()) {
             g.drawString(font, Component.translatable("gui.broadcast.playlist.empty"),
                     px + 8, py + 70, GuiTheme.FAINT, false);
         } else {
-            playlistScroll = Mth.clamp(playlistScroll, 0, Math.max(0, view.playlist().size() - visible));
-            for (int i = 0; i < visible && playlistScroll + i < view.playlist().size(); i++) {
-                int idx = playlistScroll + i;
-                int ey = py + 22 + i * ROW_H;
+            for (int i = 0; i < 5; i++) {
+                int idx = upcomingIndex(view, i);
+                int ey = py + 48 + i * ROW_H;
                 boolean sel = idx == selectedPlaylist;
                 boolean hover = hovered(px + 2, ey, pw - 8, ROW_H - 2);
                 if (sel) GuiTheme.rr(g, px + 2, ey, pw - 6, ROW_H - 2, GuiTheme.CARD_ACTIVE, GuiTheme.ACCENT_DARK);
                 else if (hover) g.fill(px + 2, ey, px + pw - 4, ey + ROW_H - 2, GuiTheme.CARD_HOVER);
                 String uid = view.playlist().get(idx);
-                g.drawString(font, (i + 1) + ".", px + 7, ey + 3, GuiTheme.FAINT, false);
+                g.drawString(font, (playlistPage * 5 + i + 1) + ".", px + 7, ey + 3, GuiTheme.FAINT, false);
                 g.drawString(font, GuiTheme.trim(nameForUid(view, uid), 14), px + 24, ey + 3,
                         sel ? GuiTheme.TEXT : GuiTheme.DIM, false);
             }
         }
-        drawScrollbar(g, px + pw - 5, py + 20, ph - 24, view.playlist().size(), visible, playlistScroll);
+        // 页码切换(无限页)
+        int arrowY = py + 130;
+        boolean leftHover = hovered(px + 8, arrowY, 15, 11);
+        boolean rightHover = hovered(px + pw - 23, arrowY, 15, 11);
+        g.drawString(font, "<", px + 10, arrowY, leftHover ? GuiTheme.ACCENT_HOVER : GuiTheme.FAINT, false);
+        g.drawString(font, ">", px + pw - 21, arrowY, rightHover ? GuiTheme.ACCENT_HOVER : GuiTheme.FAINT, false);
 
         // 设置
         drawValueField(g, x + 242, y + 198, 104, 18,
@@ -277,10 +314,23 @@ public class SecondaryScreen extends Screen {
                 return true;
             }
             int px = x + 194, py = y + 50;
-            if (mx >= px && mx < px + 152 && my >= py + 22 && my < py + 138) {
-                int idx = (int) ((my - (py + 22)) / ROW_H) + playlistScroll;
-                if (idx >= 0 && idx < view.playlist().size()) selectedPlaylist = idx;
+            if (mx >= px && mx < px + 152 && my >= py + 48 && my < py + 128) {
+                int slot = (int) ((my - (py + 48)) / ROW_H);
+                if (slot >= 0 && slot < 5) {
+                    selectedPlaylist = upcomingIndex(view, slot);
+                }
                 return true;
+            }
+            if (my >= py + 130 && my < py + 141) {
+                int pages = pageCount(view);
+                if (mx >= px + 8 && mx < px + 23) {
+                    playlistPage = Math.floorMod(playlistPage - 1, pages);
+                    return true;
+                }
+                if (mx >= px + 129 && mx < px + 144) {
+                    playlistPage = Math.floorMod(playlistPage + 1, pages);
+                    return true;
+                }
             }
             // 滚轮数值框:左键 +，右键 -
             if (mx >= x + 242 && mx < x + 346 && my >= y + 198 && my < y + 216) {
@@ -319,8 +369,8 @@ public class SecondaryScreen extends Screen {
                 return true;
             }
             if (mx >= x + 194 && mx < x + 346 && my >= y + 50 && my < y + 192) {
-                playlistScroll = Mth.clamp(playlistScroll - (int) Math.signum(delta), 0,
-                        Math.max(0, view.playlist().size() - 7));
+                int pages = pageCount(view);
+                playlistPage = Math.floorMod(playlistPage - (int) Math.signum(delta), pages);
                 return true;
             }
         }
@@ -335,6 +385,7 @@ public class SecondaryScreen extends Screen {
             if (gapValue != view.playlistGap()) gapValue = view.playlistGap();
             if (trackValue != view.playlistTrackSeconds()) trackValue = view.playlistTrackSeconds();
             if (selectedPlaylist >= view.playlist().size()) selectedPlaylist = view.playlist().size() - 1;
+            playlistPage = Mth.clamp(playlistPage, 0, pageCount(view) - 1);
         }
     }
 

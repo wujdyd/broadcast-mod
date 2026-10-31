@@ -22,5 +22,7 @@ SOFTWARE.
 
 ---
 
-Bundled dependency: JLayer (javazoom.jl) is licensed under the GNU LGPL 2.1.
-It is packaged as a separate jar under META-INF/jarjar/.
+Bundled dependencies:
+- JLayer (javazoom.jl) is licensed under the GNU LGPL 2.1.
+- jFLAC (org.jflac:jflac-codec) is licensed under the GNU LGPL 2.1.
+Both are packaged as separate jars under META-INF/jarjar/.

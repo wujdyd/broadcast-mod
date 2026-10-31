@@ -1,5 +1,6 @@
 package com.broadcast.item;
 
+import com.broadcast.server.IndicatorLinkManager;
 import com.broadcast.util.Access;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -38,6 +39,10 @@ public class DebuggerItem extends Item {
         }
         if (!(context.getPlayer() instanceof ServerPlayer player)) {
             return InteractionResult.PASS;
+        }
+        // 指示灯连接模式优先,且不消耗耐久
+        if (IndicatorLinkManager.handleDebuggerUse(player, context.getClickedPos())) {
+            return InteractionResult.CONSUME;
         }
         if (!openFor(player, context.getClickedPos())) {
             return InteractionResult.PASS;
@@ -86,12 +91,16 @@ public class DebuggerItem extends Item {
         int next = stack.getDamageValue() + amount;
         if (next >= stack.getMaxDamage()) {
             stack.shrink(1);
+            player.playSound(net.minecraft.sounds.SoundEvents.ITEM_BREAK, 1.0F, 1.0F);
             player.displayClientMessage(Component.translatable("msg.broadcast.debugger_broken")
                     .withStyle(ChatFormatting.RED), true);
             player.broadcastBreakEvent(EquipmentSlot.MAINHAND);
-            return true;
+        } else {
+            stack.setDamageValue(next);
         }
-        stack.setDamageValue(next);
+        // 让耐久条/客户端物品同步,避免出现“虚假耐久”
+        player.getInventory().setChanged();
+        if (player.containerMenu != null) player.containerMenu.broadcastChanges();
         return true;
     }
 

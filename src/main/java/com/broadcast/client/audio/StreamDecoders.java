@@ -18,6 +18,7 @@ public final class StreamDecoders {
             String ext = NameUtil.extension(target);
             if (ext.equals("wav")) type = "wav";
             else if (ext.equals("mp3")) type = "mp3";
+            else if (ext.equals("flac")) type = "flac";
             else type = "ogg";
         }
         switch (type) {
@@ -29,6 +30,9 @@ public final class StreamDecoders {
                     throw new IOException("MP3 解码器不可用:请重新安装完整模组 jar");
                 }
                 return new Mp3StreamDecoder(in);
+            }
+            case "flac" -> {
+                return new FlacStreamDecoder(in);
             }
             default -> {
                 return new OggStreamDecoder(in);
@@ -46,6 +50,7 @@ public final class StreamDecoders {
             if (n >= 4) {
                 String tag = new String(head, 0, 4, java.nio.charset.StandardCharsets.US_ASCII);
                 if (tag.equals("OggS")) return "ogg";
+                if (tag.equals("fLaC")) return "flac";
                 if (tag.equals("RIFF") && n >= 12
                         && new String(head, 8, 4, java.nio.charset.StandardCharsets.US_ASCII).equals("WAVE")) {
                     return "wav";

@@ -1,7 +1,6 @@
 package com.broadcast.server;
 
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
-import com.broadcast.config.BroadcastConfig;
 import com.broadcast.item.PortableMicrophoneItem;
 import com.broadcast.network.NetworkHandler;
 import com.broadcast.network.packet.MicAudioPacket;
@@ -66,9 +65,14 @@ public final class PortableMicManager {
 
         String freq = PortableMicrophoneItem.getFrequency(stack);
         List<BlockPos> speakers = new ArrayList<>();
-        double radius = Math.max(1, BroadcastConfig.micDetectionRadius());
+        // 便携式话筒:广播器附近 300 格内均可使用
+        double radius = 300.0D;
         double r2 = radius * radius;
         for (BlockPos pos : BroadcastRegistryData.get(sl).speakersFor(sl, java.util.Set.of(freq))) {
+            if (sl.getBlockEntity(pos) instanceof com.broadcast.blockentity.SpeakerBlockEntity speaker
+                    && speaker.isMuted()) {
+                continue;
+            }
             if (player.position().distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= r2) {
                 speakers.add(pos);
             }

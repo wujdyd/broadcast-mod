@@ -11,7 +11,7 @@ import java.util.Set;
  * 广播器与话筒通过相同频率建立连接;广播站可同时持有多个频率。
  */
 public final class FrequencyUtil {
-    public static final String DEFAULT = "CH1";
+    public static final String DEFAULT = "1";
     public static final int MAX_LENGTH = 12;
     public static final int MAX_STATION_FREQUENCIES = 8;
 

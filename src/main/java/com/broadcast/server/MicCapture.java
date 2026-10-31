@@ -15,6 +15,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -107,13 +109,21 @@ public final class MicCapture {
         ACTIVE.clear();
     }
 
+    /** 广播失败只通知广播器附近的玩家;没有广播器时才退回话筒附近。 */
     private static void notifyNear(MicrophoneBlockEntity mic, Component msg) {
         if (!(mic.getLevel() instanceof ServerLevel sl)) return;
-        BlockPos pos = mic.getBlockPos();
+        List<BlockPos> targets = new ArrayList<>(mic.getOutputSpeakers());
+        if (targets.isEmpty()) targets.add(mic.getBlockPos());
         for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) {
-            if (p.level() == sl && p.blockPosition().distSqr(pos) < 32 * 32) {
-                p.displayClientMessage(msg, false);
+            if (p.level() != sl) continue;
+            boolean near = false;
+            for (BlockPos pos : targets) {
+                if (p.blockPosition().distSqr(pos) < 32 * 32) {
+                    near = true;
+                    break;
+                }
             }
+            if (near) p.displayClientMessage(msg, false);
         }
     }
 

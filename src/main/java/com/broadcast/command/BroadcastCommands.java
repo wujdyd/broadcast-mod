@@ -2,6 +2,7 @@ package com.broadcast.command;
 
 import com.broadcast.server.MusicLibrary;
 import com.broadcast.server.UploadHttpServer;
+import com.broadcast.util.FrequencyBandManager;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -16,6 +17,7 @@ public final class BroadcastCommands {
             "command.broadcast.help.list",
             "command.broadcast.help.music",
             "command.broadcast.help.recipe",
+            "command.broadcast.help.band",
             "command.broadcast.help.delete",
             "command.broadcast.help.restart",
             "command.broadcast.help.stopweb",
@@ -40,6 +42,12 @@ public final class BroadcastCommands {
                 .then(Commands.literal("restart").executes(BroadcastCommands::restart))
                 .then(Commands.literal("stopweb").executes(BroadcastCommands::stopWeb))
                 .then(Commands.literal("startweb").executes(BroadcastCommands::startWeb))
+                .then(Commands.literal("band")
+                        .executes(BroadcastCommands::listBands)
+                        .then(Commands.argument("group", StringArgumentType.word())
+                                .then(Commands.argument("range", RangeArgument.range())
+                                        .then(Commands.argument("english", StringArgumentType.word())
+                                                .executes(BroadcastCommands::setBand)))))
                 .executes(BroadcastCommands::listCommands));
     }
 
@@ -80,6 +88,57 @@ public final class BroadcastCommands {
         ctx.getSource().sendSuccess(() -> Component.literal("broadcast recipes (" + recipes.size() + "): "
                 + String.join(", ", recipes)), false);
         return recipes.size();
+    }
+
+    private static boolean requireOp3(CommandSourceStack source) {
+        if (source.hasPermission(3)) return true;
+        source.sendFailure(Component.translatable("command.broadcast.no_permission"));
+        return false;
+    }
+
+    private static int listBands(CommandContext<CommandSourceStack> ctx) {
+        for (FrequencyBandManager.Group g : FrequencyBandManager.Group.values()) {
+            ctx.getSource().sendSuccess(() -> Component.literal(FrequencyBandManager.describe(g)), false);
+        }
+        return FrequencyBandManager.Group.values().length;
+    }
+
+    private static int setBand(CommandContext<CommandSourceStack> ctx) {
+        CommandSourceStack source = ctx.getSource();
+        if (!requireOp3(source)) return 0;
+        FrequencyBandManager.Group group =
+                FrequencyBandManager.Group.byName(StringArgumentType.getString(ctx, "group"));
+        if (group == null) {
+            source.sendFailure(Component.translatable("command.broadcast.band_group_invalid"));
+            return 0;
+        }
+        String raw = StringArgumentType.getString(ctx, "range");
+        int start;
+        int end;
+        try {
+            String[] parts = raw.split(":", -1);
+            if (parts.length != 2) throw new NumberFormatException();
+            start = Integer.parseInt(parts[0]);
+            end = Integer.parseInt(parts[1]);
+        } catch (Throwable t) {
+            source.sendFailure(Component.translatable("command.broadcast.band_invalid"));
+            return 0;
+        }
+        String englishRaw = StringArgumentType.getString(ctx, "english");
+        boolean english;
+        if ("yes".equalsIgnoreCase(englishRaw)) english = true;
+        else if ("no".equalsIgnoreCase(englishRaw)) english = false;
+        else {
+            source.sendFailure(Component.translatable("command.broadcast.band_english_invalid"));
+            return 0;
+        }
+        String error = FrequencyBandManager.setBand(group, start, end, english);
+        if (error != null) {
+            source.sendFailure(Component.translatable(error));
+            return 0;
+        }
+        source.sendSuccess(() -> Component.literal(FrequencyBandManager.describe(group)), true);
+        return 1;
     }
 
     private static int deleteMusic(CommandContext<CommandSourceStack> ctx) {

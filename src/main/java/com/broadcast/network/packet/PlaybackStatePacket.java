@@ -12,13 +12,14 @@ import java.util.function.Supplier;
 
 /** 广播站播放状态同步:开始/停止、曲目、音量、出声的广播器列表。 */
 public record PlaybackStatePacket(BlockPos station, boolean playing, String target, boolean url,
-                                  int volumePercent, List<BlockPos> speakers) {
+                                  boolean loop, int volumePercent, List<BlockPos> speakers) {
 
     public static void encode(PlaybackStatePacket p, FriendlyByteBuf buf) {
         buf.writeBlockPos(p.station);
         buf.writeBoolean(p.playing);
         buf.writeUtf(p.target, 1024);
         buf.writeBoolean(p.url);
+        buf.writeBoolean(p.loop);
         buf.writeInt(p.volumePercent);
         buf.writeInt(p.speakers.size());
         for (BlockPos s : p.speakers) buf.writeBlockPos(s);
@@ -29,28 +30,23 @@ public record PlaybackStatePacket(BlockPos station, boolean playing, String targ
         boolean playing = buf.readBoolean();
         String target = buf.readUtf(1024);
         boolean url = buf.readBoolean();
+        boolean loop = buf.readBoolean();
         int vol = buf.readInt();
         int n = Math.min(buf.readInt(), 4096);
         List<BlockPos> speakers = new ArrayList<>(n);
         for (int i = 0; i < n; i++) speakers.add(buf.readBlockPos());
-        return new PlaybackStatePacket(station, playing, target, url, vol, speakers);
+        return new PlaybackStatePacket(station, playing, target, url, loop, vol, speakers);
     }
 
     public static void handle(PlaybackStatePacket p, Supplier<NetworkEvent.Context> ctxSup) {
         ctxSup.get().enqueueWork(() -> {
-            var previous = ClientDataHolder.getPlayState(p.station);
-            boolean sameSpeakers = previous != null
-                    && new java.util.HashSet<>(previous.speakers()).equals(new java.util.HashSet<>(p.speakers));
             ClientDataHolder.setPlaybackState(p.station, p.playing, p.target, p.url,
                     p.volumePercent, p.speakers);
             float vol = p.volumePercent / 100F;
             if (p.playing) {
-                // 同曲目且广播器未变化时只更新音量,避免打断重播
-                if (ClientAudioManager.isPlaying(p.station, p.target)
-                        && ClientAudioManager.hasSessionAt(p.station) && sameSpeakers) {
-                    ClientAudioManager.setVolume(p.station, vol);
-                } else {
-                    ClientAudioManager.startMusic(p.station, p.target, p.url, vol, p.speakers);
+                // 同曲目/同 URL 时只更新音量与喇叭列表;新增同频喇叭不会重置进度
+                if (!ClientAudioManager.updateMusic(p.station, p.target, p.url, p.loop, vol, p.speakers)) {
+                    ClientAudioManager.startMusic(p.station, p.target, p.url, p.loop, vol, p.speakers);
                 }
             } else {
                 ClientAudioManager.stopMusic(p.station);

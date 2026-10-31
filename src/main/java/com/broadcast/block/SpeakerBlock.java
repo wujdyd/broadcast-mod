@@ -216,6 +216,11 @@ public class SpeakerBlock extends Block implements EntityBlock, SimpleWaterlogge
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide && level instanceof ServerLevel sl) {
             BroadcastRegistryData.get(sl).addSpeaker(pos);
+            if (placer instanceof Player player
+                    && level.getBlockEntity(pos) instanceof SpeakerBlockEntity be) {
+                int permission = player.hasPermissions(3) ? 3 : player.hasPermissions(2) ? 2 : 0;
+                be.setOwner(player, permission);
+            }
         }
     }
 }

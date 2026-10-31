@@ -167,6 +167,9 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
             net.minecraft.world.phys.Vec3 center = net.minecraft.world.phys.Vec3.atCenterOf(worldPosition);
             List<BlockPos> out = new ArrayList<>();
             for (BlockPos pos : all) {
+                if (!(level.getBlockEntity(pos) instanceof SpeakerBlockEntity speaker) || speaker.isMuted()) {
+                    continue;
+                }
                 if (net.minecraft.world.phys.Vec3.atCenterOf(pos).distanceToSqr(center) <= r2) out.add(pos);
             }
             return out;
@@ -222,28 +225,40 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     private void startBroadcast() {
-        if (getOutputSpeakers().isEmpty()) {
+        List<BlockPos> speakers = getOutputSpeakers();
+        if (speakers.isEmpty()) {
             setActive(false);
             lastShouldBroadcast = false;
             broadcastState();
             return;
         }
-        if (useClientCapture()) {
-            ServerPlayer ownerPlayer = ownerPlayer();
-            if (ownerPlayer != null) {
-                clientCapture = true;
-                setActive(true);
-                if (pauseMusicWhileTalking) pauseStations();
-                NetworkHandler.sendToPlayer(ownerPlayer, new MicCaptureControlPacket(worldPosition, true,
-                        Math.round(getStationVolume() * 100), getOutputSpeakers()));
-                broadcastState();
-                playStartSound();
-                return;
-            }
+        // 先播放提示音:即使采集设备初始化失败,玩家也能听到“话筒已开启”
+        playStartSound();
+
+        ServerPlayer ownerPlayer = ownerPlayer();
+        boolean clientCapture = useClientCapture()
+                || (ownerPlayer != null && !MicCapture.isAvailable());
+        if (clientCapture && ownerPlayer != null) {
+            startClientCapture(ownerPlayer);
+            return;
         }
+
         MicCapture.tryStart(this);
+        if (!isActive() && ownerPlayer != null) {
+            // 服务端声卡不可用/打开失败时,回退到话筒主人的客户端采集
+            startClientCapture(ownerPlayer);
+            return;
+        }
         if (isActive() && pauseMusicWhileTalking) pauseStations();
-        if (isActive()) playStartSound();
+    }
+
+    private void startClientCapture(ServerPlayer ownerPlayer) {
+        clientCapture = true;
+        setActive(true);
+        if (pauseMusicWhileTalking) pauseStations();
+        NetworkHandler.sendToPlayer(ownerPlayer, new MicCaptureControlPacket(worldPosition, true,
+                Math.round(getStationVolume() * 100), getOutputSpeakers()));
+        broadcastState();
     }
 
     private void playStartSound() {

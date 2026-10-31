@@ -3,6 +3,7 @@ package com.broadcast.event;
 import com.broadcast.blockentity.BroadcastStationBlockEntity;
 import com.broadcast.blockentity.MicrophoneBlockEntity;
 import com.broadcast.registry.ModItems;
+import com.broadcast.server.IndicatorLinkManager;
 import com.broadcast.server.MicCapture;
 import com.broadcast.server.MusicLibrary;
 import com.broadcast.server.PortableMicManager;
@@ -37,6 +38,7 @@ public class CommonEvents {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
+        com.broadcast.util.FrequencyBandManager.load(event.getServer());
         MusicLibrary.get().reload();
         UploadHttpServer.start(event.getServer());
     }
@@ -53,6 +55,7 @@ public class CommonEvents {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         PortableMicManager.onLogout(player);
+        IndicatorLinkManager.onLogout(player);
         if (!(player.level() instanceof ServerLevel level)) return;
         for (BlockPos pos : new ArrayList<>(BroadcastRegistryData.get(level).getMicrophones())) {
             if (!level.isLoaded(pos)) continue;
@@ -81,6 +84,15 @@ public class CommonEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onServerTick(net.minecraftforge.event.TickEvent.ServerTickEvent event) {
+        if (event.phase == net.minecraftforge.event.TickEvent.Phase.END && event.getServer() != null) {
+            if (event.getServer().getTickCount() % 10 == 0) {
+                IndicatorLinkManager.tick(event.getServer());
+            }
+        }
+    }
+
     private static void syncStates(ServerPlayer player) {
         if (!(player.level() instanceof ServerLevel level)) return;
         BroadcastRegistryData reg = BroadcastRegistryData.get(level);
@@ -100,30 +112,6 @@ public class CommonEvents {
 
     @SubscribeEvent
     public static void onTooltip(ItemTooltipEvent event) {
-        var item = event.getItemStack().getItem();
-        if (item == ModItems.STATION.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.station").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.WALL_SPEAKER.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.wall_speaker").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.CEILING_SPEAKER.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.ceiling_speaker").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.FLOOR_SPEAKER.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.floor_speaker").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.COLUMN_SPEAKER.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.column_speaker").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.INDICATOR_LIGHT.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.indicator_light").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.MICROPHONE.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.microphone").withStyle(ChatFormatting.GRAY));
-        } else if (item == ModItems.DEBUGGER.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.debugger").withStyle(ChatFormatting.GRAY));
-            var stack = event.getItemStack();
-            int remaining = stack.getMaxDamage() - stack.getDamageValue();
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.debugger_durability",
-                    remaining, stack.getMaxDamage()).withStyle(ChatFormatting.DARK_AQUA));
-        } else if (item == ModItems.PORTABLE_MICROPHONE.get()) {
-            event.getToolTip().add(Component.translatable("tooltip.broadcast.portable_microphone")
-                    .withStyle(ChatFormatting.GRAY));
-        }
+        // 物品名称下方不显示额外说明文字;耐久由原版耐久条显示。
     }
 }

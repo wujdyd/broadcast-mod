@@ -1,6 +1,7 @@
 package com.broadcast.network.packet;
 
 import com.broadcast.item.PortableMicrophoneItem;
+import com.broadcast.util.FrequencyBandManager;
 import com.broadcast.util.FrequencyUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,6 +34,11 @@ public record SetPortableMicSettingsPacket(boolean offhand, String frequency, bo
             if (!(stack.getItem() instanceof PortableMicrophoneItem)) return;
             String f = FrequencyUtil.normalize(p.frequency);
             if (f.isEmpty()) return;
+            if (!FrequencyBandManager.canUse(player, f)) {
+                player.displayClientMessage(net.minecraft.network.chat.Component.translatable(
+                        "msg.broadcast.freq_forbidden"), true);
+                return;
+            }
             PortableMicrophoneItem.setFrequency(stack, f);
             PortableMicrophoneItem.setPauseMusic(stack, p.pauseMusic);
             player.getInventory().setChanged();

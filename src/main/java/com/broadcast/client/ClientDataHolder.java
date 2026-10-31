@@ -123,6 +123,33 @@ public final class ClientDataHolder {
         MIC_ACTIVE.put(mic, active);
     }
 
+    /** 当前正在播放的曲目名(用于音频字幕);没有则返回 null。 */
+    public static String playingSubtitle() {
+        for (PlayState state : PLAY_STATES.values()) {
+            if (!state.playing() || state.target().isEmpty()) continue;
+            String target = state.target();
+            if (state.url()) {
+                try {
+                    String host = java.net.URI.create(target).getHost();
+                    return host == null ? "网络音频" : host;
+                } catch (Throwable ignored) {
+                    return "网络音频";
+                }
+            }
+            String name = NameUtil.sanitizeFileName(target);
+            int dot = name.lastIndexOf('.');
+            return dot > 0 ? name.substring(0, dot) : name;
+        }
+        return null;
+    }
+
+    public static boolean anyMicActive() {
+        for (Boolean active : MIC_ACTIVE.values()) {
+            if (Boolean.TRUE.equals(active)) return true;
+        }
+        return false;
+    }
+
     public static boolean isMicActive(BlockPos mic) {
         return Boolean.TRUE.equals(MIC_ACTIVE.get(mic));
     }

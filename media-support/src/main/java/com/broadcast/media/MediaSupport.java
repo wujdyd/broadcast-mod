@@ -17,8 +17,11 @@ public final class MediaSupport {
     private MediaSupport() {
     }
 
-    public static String resolveBlocking(ServerPlayer player, String url, String outputDir) throws Exception {
-        Path dir = Path.of(outputDir);
+    public static void ensureTools(ServerPlayer player) throws Exception {
+        ToolManager.ensure(player);
+    }
+
+    public static String resolveBlocking(ServerPlayer player, String url, String outputDir) throws Exception {        Path dir = Path.of(outputDir);
         Files.createDirectories(dir);
         ToolManager.Tools tools = ToolManager.ensure(player);
         String hash = sha1(url).substring(0, 12);
@@ -31,6 +34,7 @@ public final class MediaSupport {
         command.add(tools.ytdlp().toString());
         command.add("--no-playlist");
         command.add("--no-warnings");
+        if (MediaSupportConfig.INSECURE_SSL.get()) command.add("--no-check-certificates");
         command.add("--restrict-filenames");
         command.add("--ffmpeg-location");
         command.add(tools.ffmpeg().getParent().toString());

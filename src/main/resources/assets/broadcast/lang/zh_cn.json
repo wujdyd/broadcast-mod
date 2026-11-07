@@ -1,6 +1,5 @@
 {
   "itemGroup.broadcast": "广播设备",
-
   "block.broadcast.station": "广播站",
   "block.broadcast.wall_speaker": "挂墙式广播器",
   "block.broadcast.ceiling_speaker": "吸顶式广播器",
@@ -10,7 +9,6 @@
   "block.broadcast.indicator_light": "广播指示灯",
   "item.broadcast.debugger": "广播调试器",
   "item.broadcast.portable_microphone": "便携式麦克风",
-
   "container.broadcast.station": "广播站",
   "gui.broadcast.subtitle": "校园 / 车站广播控制台",
   "gui.broadcast.tab.music": "音乐库",
@@ -79,8 +77,7 @@
   "gui.broadcast.upload_cancel": "已取消上传",
   "gui.broadcast.upload_fail": "上传失败(%s): %s",
   "gui.broadcast.upload_error": "上传出错: %s",
-
-  "gui.broadcast.freq.placeholder": "英文/数字,如 CH1",
+  "gui.broadcast.freq.placeholder": "数字/小数/英文,如 1 / 40.5 / CH1",
   "gui.broadcast.freq.add": "添加",
   "gui.broadcast.freq.remove": "删除选中",
   "gui.broadcast.freq.list": "频率列表(%s 个)",
@@ -89,7 +86,7 @@
   "gui.broadcast.freq.loop": "定时循环: %s",
   "gui.broadcast.freq.loop_playing": "● 定时播放中",
   "gui.broadcast.freq.loop_waiting": "○ 等待下一次",
-  "gui.broadcast.freq.hint1": "频率由英文/数字组成(不区分大小写),最多 8 个",
+  "gui.broadcast.freq.hint1": "频率支持英文、整数或最多 3 位小数;最多 8 个",
   "gui.broadcast.freq.hint2": "广播器和话筒设置相同频率即可收到广播",
   "gui.broadcast.freq.hint3": "播放列表在音乐库页的「播放列表」里设置;红石模式控制播放",
   "msg.broadcast.delete_done": "已删除音乐: %s",
@@ -107,7 +104,6 @@
   "msg.broadcast.video_ready": "视频音频已就绪: %s",
   "msg.broadcast.video_failed": "视频音频解析失败: %s",
   "gui.broadcast.freq.current": "当前频率: %s",
-
   "gui.broadcast.device.speaker": "广播器",
   "gui.broadcast.device.speaker_subtitle": "设置广播器接收频率",
   "gui.broadcast.device.mic_subtitle": "设置话筒频率与红石控制",
@@ -141,7 +137,6 @@
   "gui.broadcast.device.speakers_status": "广播器 %s 台 / 通电 %s / %s 格",
   "gui.broadcast.device.mic_extra": "广播站: %s 个 / 音量 %s%%",
   "gui.broadcast.recv": "正在从服务器接收音频…",
-
   "msg.broadcast.linked": "已连接到广播站: %s",
   "msg.broadcast.no_station": "附近没有广播站",
   "msg.broadcast.mic_status": "话筒状态: %s",
@@ -153,9 +148,8 @@
   "msg.broadcast.bad_url": "网络音乐地址必须是 http:// 或 https:// 直链",
   "msg.broadcast.file_missing": "音乐文件不存在,请先上传",
   "msg.broadcast.too_far": "离广播站太远了",
-  "msg.broadcast.need_debugger": "需要使用「广播调试器」右键才能打开此界面",
+  "msg.broadcast.need_debugger": "需要拥有「广播调试器」右键才能打开此界面",
   "msg.broadcast.debugger_invalid": "这个方块没有可打开的界面",
-
   "tooltip.broadcast.station": "广播系统的核心,按频率连接广播器与话筒,可设置多个频率",
   "tooltip.broadcast.wall_speaker": "壁挂式号角,适合走廊、教室墙面,灵感来自校园广播",
   "tooltip.broadcast.ceiling_speaker": "吸顶式扬声器,适合车站大厅、报告厅天花板",
@@ -166,7 +160,6 @@
   "tooltip.broadcast.debugger": "右键广播站/广播器/话筒打开界面;450 点耐久,可合成",
   "tooltip.broadcast.debugger_durability": "耐久: %s / %s",
   "tooltip.broadcast.portable_microphone": "右键开始/停止讲话,Shift+右键设置频率;无耐久",
-
   "command.broadcast.no_permission": "需要管理员权限(OP)",
   "command.broadcast.help.list": "/? list command - 显示本模组指令",
   "command.broadcast.help.music": "/? list music - 列出音乐库 UID 与文件名",
@@ -188,5 +181,19 @@
   "command.broadcast.band_group_invalid": "权限组必须是 max / cr / su",
   "command.broadcast.band_invalid": "频率段格式必须是 起始:终了,且为非负整数",
   "command.broadcast.band_english_invalid": "是否包含英文必须是 yes 或 no",
-  "command.broadcast.band_overlap": "该频率段与其它权限组交叉"
+  "command.broadcast.band_overlap": "该频率段与其它权限组交叉",
+  "gui.broadcast.access.mode": "访问: %s",
+  "gui.broadcast.access.public": "公开",
+  "gui.broadcast.access.private": "私人",
+  "gui.broadcast.access.password": "密码",
+  "gui.broadcast.access.password_hint": "密码",
+  "gui.broadcast.access.unlock": "解锁",
+  "msg.broadcast.sound_stopped": "已停止广播声音",
+  "msg.broadcast.station_locked": "该广播站已加密,请先解锁",
+  "msg.broadcast.station_owner_only": "只有广播站主人或 OP3 可以修改访问模式",
+  "msg.broadcast.station_password_required": "密码模式需要填写密码",
+  "msg.broadcast.station_wrong_password": "密码错误",
+  "msg.broadcast.station_unlocked": "广播站已解锁",
+  "command.broadcast.help.find": "/? find <频率> - 查询该频率被谁占用",
+  "command.broadcast.find_invalid": "频率格式不正确"
 }

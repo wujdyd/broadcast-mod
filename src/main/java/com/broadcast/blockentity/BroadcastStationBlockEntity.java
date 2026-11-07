@@ -27,11 +27,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class BroadcastStationBlockEntity extends BlockEntity implements MenuProvider {
+
+    public enum AccessMode {
+        PUBLIC, PRIVATE, PASSWORD
+    }
 
     public static final int DATA_VOLUME = 0;
     public static final int DATA_PLAYING = 1;
@@ -43,6 +49,11 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     private boolean targetIsUrl;
     private boolean redstoneMode;
     private boolean wasPowered;
+    private AccessMode accessMode = AccessMode.PUBLIC;
+    private String accessPassword = "";
+    @Nullable
+    private UUID owner;
+    private final Set<UUID> authorized = new HashSet<>();
 
     /** 该广播站同时广播的频率(可多频率同步广播)。 */
     private final Set<String> frequencies = new LinkedHashSet<>();
@@ -51,7 +62,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     private final List<String> playlist = new ArrayList<>();
     private boolean playlistLoop;
     private boolean playlistReverse;
-    private int playlistGapSeconds = 60;
+    private int playlistGapSeconds = 5;
     private int playlistTrackSeconds = 600;
     private int playlistIndex;
     /** 0 = 间隔等待;1 = 正在播放列表曲目 */
@@ -124,6 +135,77 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     public void setRedstoneMode(boolean on) {
         this.redstoneMode = on;
         setChanged();
+    }
+
+    // ---------- 访问模式 ----------
+
+    public AccessMode getAccessMode() {
+        return accessMode;
+    }
+
+    public boolean hasAccessPassword() {
+        return !accessPassword.isEmpty();
+    }
+
+    @Nullable
+    public UUID getOwner() {
+        return owner;
+    }
+
+    public void setOwner(@Nullable Player player) {
+        if (player != null) {
+            owner = player.getUUID();
+            authorized.add(owner);
+            setChanged();
+        }
+    }
+
+    public boolean isOwnerOrOp(Player player) {
+        return player != null && (player.hasPermissions(3) || (owner != null && owner.equals(player.getUUID())));
+    }
+
+    public boolean canAccess(Player player) {
+        if (player == null) return false;
+        if (player.hasPermissions(3)) return true;
+        if (owner != null && owner.equals(player.getUUID())) return true;
+        return switch (accessMode) {
+            case PUBLIC -> true;
+            case PRIVATE -> false;
+            case PASSWORD -> authorized.contains(player.getUUID());
+        };
+    }
+
+    public boolean canConfigure(Player player) {
+        return canAccess(player);
+    }
+
+    public boolean tryAuthorize(Player player, String password) {
+        if (player == null || accessMode != AccessMode.PASSWORD) return true;
+        if (player.hasPermissions(3) || (owner != null && owner.equals(player.getUUID()))) return true;
+        if (accessPassword.isEmpty() || !accessPassword.equals(password)) return false;
+        authorized.add(player.getUUID());
+        setChanged();
+        return true;
+    }
+
+    public boolean setAccess(AccessMode mode, String password, Player actor) {
+        if (!isOwnerOrOp(actor)) return false;
+        accessMode = mode == null ? AccessMode.PUBLIC : mode;
+        accessPassword = accessMode == AccessMode.PASSWORD && password != null ? password : "";
+        authorized.clear();
+        if (owner != null) authorized.add(owner);
+        if (actor != null) authorized.add(actor.getUUID());
+        setChanged();
+        broadcastInfo();
+        broadcastState();
+        if (level instanceof ServerLevel sl) {
+            for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) {
+                if (p.level() == sl && !canAccess(p)) {
+                    NetworkHandler.sendToPlayer(p, new com.broadcast.network.packet.StopAllAudioPacket());
+                }
+            }
+        }
+        return true;
     }
 
     // ---------- 频率 ----------
@@ -353,7 +435,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
         if (!(level instanceof ServerLevel sl)) return;
         PlaybackStatePacket pkt = statePacket();
         for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) {
-            if (p.level() == sl) NetworkHandler.sendToPlayer(p, pkt);
+            if (p.level() == sl && canAccess(p)) NetworkHandler.sendToPlayer(p, pkt);
         }
     }
 
@@ -368,23 +450,25 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
                 new ArrayList<>(frequencies),
                 UploadHttpServer.isRunning() ? com.broadcast.config.BroadcastConfig.uploadPort() : 0,
                 new ArrayList<>(playlist), playlistLoop, playlistReverse,
-                playlistGapSeconds, playlistTrackSeconds, playlistIndex, isPlaylistPlaying());
+                playlistGapSeconds, playlistTrackSeconds, playlistIndex, isPlaylistPlaying(),
+                accessMode.ordinal(), hasAccessPassword());
     }
 
     public void sendInfoTo(ServerPlayer player) {
-        if (player != null) NetworkHandler.sendToPlayer(player, infoPacket());
+        if (player == null) return;
+        NetworkHandler.sendToPlayer(player, infoPacket());
     }
 
     public void broadcastInfo() {
         if (!(level instanceof ServerLevel sl)) return;
         StationInfoPacket pkt = infoPacket();
         for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) {
-            if (p.level() == sl) NetworkHandler.sendToPlayer(p, pkt);
+            if (p.level() == sl && canAccess(p)) NetworkHandler.sendToPlayer(p, pkt);
         }
     }
 
     public void sendStateTo(ServerPlayer player) {
-        if (player == null) return;
+        if (player == null || !canAccess(player)) return;
         NetworkHandler.sendToPlayer(player, statePacket());
     }
 
@@ -451,6 +535,12 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
         tag.putString("target", target);
         tag.putBoolean("targetIsUrl", targetIsUrl);
         tag.putBoolean("redstoneMode", redstoneMode);
+        tag.putInt("accessMode", accessMode.ordinal());
+        tag.putString("accessPassword", accessPassword);
+        if (owner != null) tag.putUUID("owner", owner);
+        ListTag authorizedTag = new ListTag();
+        for (UUID uuid : authorized) authorizedTag.add(StringTag.valueOf(uuid.toString()));
+        tag.put("authorized", authorizedTag);
         tag.putBoolean("playlistLoop", playlistLoop);
         tag.putBoolean("playlistReverse", playlistReverse);
         tag.putInt("playlistGap", playlistGapSeconds);
@@ -474,9 +564,25 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
         target = tag.getString("target");
         targetIsUrl = tag.getBoolean("targetIsUrl");
         redstoneMode = tag.getBoolean("redstoneMode");
+        int mode = tag.getInt("accessMode");
+        accessMode = mode >= 0 && mode < AccessMode.values().length
+                ? AccessMode.values()[mode] : AccessMode.PUBLIC;
+        accessPassword = tag.getString("accessPassword");
+        owner = tag.hasUUID("owner") ? tag.getUUID("owner") : null;
+        authorized.clear();
+        if (tag.contains("authorized", 9)) {
+            ListTag list = tag.getList("authorized", 8);
+            for (int i = 0; i < list.size(); i++) {
+                try {
+                    authorized.add(UUID.fromString(list.getString(i)));
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+        if (owner != null) authorized.add(owner);
         playlistLoop = tag.getBoolean("playlistLoop");
         playlistReverse = tag.getBoolean("playlistReverse");
-        playlistGapSeconds = tag.contains("playlistGap") ? tag.getInt("playlistGap") : 60;
+        playlistGapSeconds = tag.contains("playlistGap") ? tag.getInt("playlistGap") : 5;
         playlistTrackSeconds = tag.contains("playlistTrackSeconds") ? tag.getInt("playlistTrackSeconds") : 600;
         playlistIndex = tag.getInt("playlistIndex");
 

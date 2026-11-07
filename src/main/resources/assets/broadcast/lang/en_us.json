@@ -1,6 +1,5 @@
 {
   "itemGroup.broadcast": "Broadcast Devices",
-
   "block.broadcast.station": "Broadcast Station",
   "block.broadcast.wall_speaker": "Wall Speaker",
   "block.broadcast.ceiling_speaker": "Ceiling Speaker",
@@ -10,7 +9,6 @@
   "block.broadcast.indicator_light": "Broadcast Indicator",
   "item.broadcast.debugger": "Broadcast Debugger",
   "item.broadcast.portable_microphone": "Portable Microphone",
-
   "container.broadcast.station": "Broadcast Station",
   "gui.broadcast.subtitle": "School / station broadcast console",
   "gui.broadcast.tab.music": "Music Library",
@@ -79,8 +77,7 @@
   "gui.broadcast.upload_cancel": "Upload cancelled",
   "gui.broadcast.upload_fail": "Upload failed (%s): %s",
   "gui.broadcast.upload_error": "Upload error: %s",
-
-  "gui.broadcast.freq.placeholder": "letters/digits, e.g. CH1",
+  "gui.broadcast.freq.placeholder": "digits / decimals / letters, e.g. 1 / 40.5 / CH1",
   "gui.broadcast.freq.add": "Add",
   "gui.broadcast.freq.remove": "Delete",
   "gui.broadcast.freq.list": "Frequencies (%s)",
@@ -89,7 +86,7 @@
   "gui.broadcast.freq.loop": "Timed loop: %s",
   "gui.broadcast.freq.loop_playing": "● Playing segment",
   "gui.broadcast.freq.loop_waiting": "○ Waiting for next",
-  "gui.broadcast.freq.hint1": "1-12 letters/digits, case-insensitive, up to 8 entries",
+  "gui.broadcast.freq.hint1": "English, integer or up to 3 decimal places; max 8",
   "gui.broadcast.freq.hint2": "Speakers and microphones on the same frequency link together",
   "gui.broadcast.freq.hint3": "Configure the playlist from the Music Library tab; redstone gates playback",
   "msg.broadcast.delete_done": "Deleted music: %s",
@@ -107,7 +104,6 @@
   "msg.broadcast.video_ready": "Video audio ready: %s",
   "msg.broadcast.video_failed": "Video audio failed: %s",
   "gui.broadcast.freq.current": "Frequencies: %s",
-
   "gui.broadcast.device.speaker": "Speaker",
   "gui.broadcast.device.speaker_subtitle": "Set the speaker receive frequency",
   "gui.broadcast.device.mic_subtitle": "Frequency and redstone control",
@@ -141,7 +137,6 @@
   "gui.broadcast.device.speakers_status": "Speakers %s / powered %s / %s m",
   "gui.broadcast.device.mic_extra": "Stations: %s / Volume %s%%",
   "gui.broadcast.recv": "Receiving audio from server...",
-
   "msg.broadcast.linked": "Linked to station: %s",
   "msg.broadcast.no_station": "No station nearby",
   "msg.broadcast.mic_status": "Microphone: %s",
@@ -153,9 +148,8 @@
   "msg.broadcast.bad_url": "URL must start with http:// or https://",
   "msg.broadcast.file_missing": "Music file not found, upload it first",
   "msg.broadcast.too_far": "Too far away from the broadcast station",
-  "msg.broadcast.need_debugger": "Use the Broadcast Debugger to open this screen",
+  "msg.broadcast.need_debugger": "You must own the Broadcast Debugger to open this screen",
   "msg.broadcast.debugger_invalid": "This block has no screen to open",
-
   "tooltip.broadcast.station": "Core of the broadcast system, links speakers and microphones by frequency",
   "tooltip.broadcast.wall_speaker": "Wall-mounted horn, inspired by school broadcasts",
   "tooltip.broadcast.ceiling_speaker": "Ceiling speaker, like station halls",
@@ -166,7 +160,6 @@
   "tooltip.broadcast.debugger": "Right-click a station/speaker/microphone to open its UI; 450 durability, craftable",
   "tooltip.broadcast.debugger_durability": "Durability: %s / %s",
   "tooltip.broadcast.portable_microphone": "Right-click to start/stop talking, Shift+right-click to configure; no durability",
-
   "command.broadcast.no_permission": "OP permission required",
   "command.broadcast.help.list": "/? list command - list this mod's commands",
   "command.broadcast.help.music": "/? list music - list music UIDs and file names",
@@ -188,5 +181,19 @@
   "command.broadcast.band_group_invalid": "Group must be max / cr / su",
   "command.broadcast.band_invalid": "Range must be start:end with non-negative integers",
   "command.broadcast.band_english_invalid": "English flag must be yes or no",
-  "command.broadcast.band_overlap": "This range overlaps another permission band"
+  "command.broadcast.band_overlap": "This range overlaps another permission band",
+  "gui.broadcast.access.mode": "Access: %s",
+  "gui.broadcast.access.public": "Public",
+  "gui.broadcast.access.private": "Private",
+  "gui.broadcast.access.password": "Password",
+  "gui.broadcast.access.password_hint": "Password",
+  "gui.broadcast.access.unlock": "Unlock",
+  "msg.broadcast.sound_stopped": "Broadcast audio stopped",
+  "msg.broadcast.station_locked": "This station is locked; unlock it first",
+  "msg.broadcast.station_owner_only": "Only the owner or OP3 can change access mode",
+  "msg.broadcast.station_password_required": "Password mode requires a password",
+  "msg.broadcast.station_wrong_password": "Wrong password",
+  "msg.broadcast.station_unlocked": "Station unlocked",
+  "command.broadcast.help.find": "/? find <frequency> - show who occupies a frequency",
+  "command.broadcast.find_invalid": "Invalid frequency"
 }

@@ -39,6 +39,11 @@ public record PlayRequestPacket(BlockPos station, String target, boolean url, in
                         .withStyle(ChatFormatting.RED), true);
                 return;
             }
+            if (!be.canAccess(player)) {
+                player.displayClientMessage(Component.translatable("msg.broadcast.station_locked")
+                        .withStyle(ChatFormatting.RED), true);
+                return;
+            }
 
             if (p.volumePercent >= 0 && p.volumePercent <= 100) {
                 be.setVolume(p.volumePercent / 100F);

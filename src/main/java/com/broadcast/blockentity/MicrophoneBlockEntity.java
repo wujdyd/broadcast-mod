@@ -172,6 +172,14 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
                 }
                 if (net.minecraft.world.phys.Vec3.atCenterOf(pos).distanceToSqr(center) <= r2) out.add(pos);
             }
+            // 同频广播器刚好超出检测半径时仍允许使用,避免“同频却完全没声”
+            if (out.isEmpty()) {
+                for (BlockPos pos : all) {
+                    if (level.getBlockEntity(pos) instanceof SpeakerBlockEntity speaker && !speaker.isMuted()) {
+                        out.add(pos);
+                    }
+                }
+            }
             return out;
         }
         return Collections.emptyList();
@@ -267,6 +275,10 @@ public class MicrophoneBlockEntity extends BlockEntity implements MenuProvider {
         if (speakers.isEmpty()) speakers = List.of(worldPosition);
         for (BlockPos pos : speakers) {
             sl.playSound(null, pos, net.minecraft.sounds.SoundEvents.BELL_BLOCK,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.6F);
+        }
+        if (!speakers.contains(worldPosition)) {
+            sl.playSound(null, worldPosition, net.minecraft.sounds.SoundEvents.BELL_BLOCK,
                     net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.6F);
         }
     }

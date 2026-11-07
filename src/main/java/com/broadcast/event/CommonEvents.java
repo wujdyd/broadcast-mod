@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
@@ -81,6 +82,21 @@ public class CommonEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             PortableMicManager.onDimensionChange(player);
             syncStates(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCommand(CommandEvent event) {
+        var parsed = event.getParseResults();
+        if (parsed == null) return;
+        boolean stopSound = parsed.getContext().getNodes().stream()
+                .anyMatch(n -> "stopsound".equals(n.getNode().getName()));
+        if (!stopSound) return;
+        var server = parsed.getContext().getSource().getServer();
+        if (server == null) return;
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            com.broadcast.network.NetworkHandler.sendToPlayer(player,
+                    new com.broadcast.network.packet.StopAllAudioPacket());
         }
     }
 

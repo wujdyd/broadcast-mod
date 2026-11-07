@@ -1,8 +1,8 @@
 # 广播站 Broadcast（Minecraft 1.20.1 + Forge 模组）
 
-校园 / 火车站风格广播系统模组。当前版本：**0.0.3br-fix2**
+校园 / 火车站风格广播系统模组。当前版本：**0.0.4br**
 
-构建产物：`build/libs/broadcast-0.0.3br-fix2-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
+构建产物：`build/libs/broadcast-0.0.4br-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
 
 ---
 
@@ -21,7 +21,7 @@
 
 ---
 
-## 0.0.3br-fix2 更新
+## 0.0.4br 更新
 
 - 调试器耐久与客户端同步，损坏时播放原版工具损坏音效；物品名称下方不再显示额外小字。
 - 单人 ESC 暂停时挂起 OpenAL 音源，恢复后继续。
@@ -35,6 +35,14 @@
 - 便携式话筒可使用 300 格内的同频广播器。
 - 权限组频率段（默认）：普通 0-40 纯数字；OP2 41-100 纯数字；OP3 任意（含英文）。可用 `/? band` 调整。
 - 干扰：OP3 放置的广播器 100 格内压制其他权限广播器；OP2 放置的广播器 100 格内压制普通玩家广播器。
+
+- 频率支持英文、整数和最多 3 位小数（如 `1.5`、`40.125`）。
+- 广播站访问模式：公开 / 私人 / 密码；密码模式在频率页设置并解锁。
+- 新增 `/? find <频率>`，返回该频率是否被占用及占用设备。
+- 适配 `/stopsound`，会停止本模组创建的广播音源并隐藏字幕。
+- 调试器提示改为“需要拥有「广播调试器」”。
+- 视频解析失败时的证书路径问题由附属 1.0.1 的 SSL 兼容模式处理。
+
 
 
 ---
@@ -55,16 +63,17 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 产物：
 
-- `build/libs/broadcast-0.0.3br-fix2-all.jar` —— **发布用**（含 JLayer/jFLAC）
-- `build/libs/broadcast-0.0.3br-fix2.jar` —— 不含内置依赖
-- `media-support/build/libs/broadcast_media_support-1.0.0-fix1.jar` —— 视频音频附属（可选）
+- `build/libs/broadcast-0.0.4br-all.jar` —— **发布用**（含 JLayer/jFLAC）
+- `build/libs/broadcast-0.0.4br.jar` —— 不含内置依赖
+- `media-support/build/libs/broadcast_media_support-1.0.0-fix2.jar` —— 客户端下载页版本
+- `media-support/build/libs/broadcast_media_support-1.0.1.jar` —— 推荐：额外含 API、SSL 兼容、下载指令
 
 ---
 
 ## 安装
 
 1. Forge 1.20.1（47.x）。
-2. 把 `broadcast-0.0.3br-fix2-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
+2. 把 `broadcast-0.0.4br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
 3. 许可证：jar 内 `LICENSE`（MIT；内置 JLayer 与 jFLAC 为 LGPL-2.1）。
 
 ---
@@ -170,7 +179,7 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 - OP2（cr）：41-100，仅纯数字
 - OP3（max）：0-999999999，可用英文
 
-`/? band su 0:40 no`、`/? band cr 41:100 no`、`/? band max 0:999999999 yes` 可调整并保存到 `world/broadcast_bands.json`；su/cr 频率段不能交叉（max 为无限制组）。
+`/? band su 0:40 no`、`/? band cr 41:100 no`、`/? band max 0:999999999 yes` 可调整；省略权限组时按范围自动推断，例如 `/? band 1:484684 yes`并保存到 `world/broadcast_bands.json`；su/cr 频率段不能交叉（max 为无限制组）。
 
 ## 配置
 
@@ -202,8 +211,9 @@ speakerRadius = 18
 
 安装：
 
-- `broadcast-0.0.3br-fix2-all.jar`（主模组）
-- `broadcast_media_support-1.0.0-fix1.jar`（附属，放在 `mods/`）
+- `broadcast-0.0.4br-all.jar`（主模组）
+- `broadcast_media_support-1.0.1.jar`（推荐附属，放在 `mods/`）
+- 或 `broadcast_media_support-1.0.0-fix2.jar`（客户端下载页版本）
 
 未安装附属时，播放视频链接会提示：
 
@@ -211,7 +221,7 @@ speakerRadius = 18
 未安装broadcast media support，无法播放
 ```
 
-附属首次使用会自动下载 `yt-dlp`（约 17MB）和 `ffmpeg`（约 80MB）到 `config/broadcast_media_support/tools/`，支持 Windows / Linux / macOS。不能联网的服务器可手动放置工具并在 `config/broadcast_media_support-common.toml` 填绝对路径。
+客户端按 `F9` 或输入 `/broadcastmedia` 可打开下载请求页。附属首次使用会自动下载 `yt-dlp`（约 17MB）和 `ffmpeg`（约 80MB）到 `config/broadcast_media_support/tools/`，支持 Windows / Linux / macOS。不能联网的服务器可手动放置工具并在 `config/broadcast_media_support-common.toml` 填绝对路径。
 
 解析结果缓存为 `broadcast_music/video_<hash>.mp3`。普通音频直链和本地音乐不需要附属。
 
@@ -223,10 +233,10 @@ speakerRadius = 18
 
 1. 离线朋友服：服务端 `online-mode=false`；
 2. 正版服：正版账号，且能访问 `sessionserver.mojang.com`；
-3. 客户端与服务端安装同一个 `broadcast-0.0.3br-fix2-all.jar`；
+3. 客户端与服务端安装同一个 `broadcast-0.0.4br-all.jar`；
 4. 局域网由主机账号验证。
 
-网络协议：`0.0.3br-fix2`（版本不一致会被 Forge 拒绝）。
+网络协议：`0.0.4br`（版本不一致会被 Forge 拒绝）。
 
 ---
 

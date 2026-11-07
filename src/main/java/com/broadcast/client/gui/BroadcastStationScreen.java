@@ -9,6 +9,8 @@ import com.broadcast.network.packet.PlayRequestPacket;
 import com.broadcast.network.packet.RequestDataPacket;
 import com.broadcast.network.packet.SetSettingsPacket;
 import com.broadcast.network.packet.SetStationFrequenciesPacket;
+import com.broadcast.network.packet.SetStationAccessPacket;
+import com.broadcast.network.packet.StationAuthPacket;
 import com.broadcast.network.packet.StopPlaybackPacket;
 import com.broadcast.util.FrequencyUtil;
 import com.broadcast.util.NameUtil;
@@ -61,6 +63,9 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
 
     private EditBox urlField;
     private EditBox freqField;
+    private AccentButton accessButton;
+    private EditBox accessPasswordField;
+    private AccentButton authButton;
     private EditBox searchField;
     private String musicSearch = "";
     private String confirmUid = "";
@@ -87,6 +92,9 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
         super.init();
         urlField = null;
         freqField = null;
+        accessButton = null;
+        accessPasswordField = null;
+        authButton = null;
         searchField = null;
         buildWidgets();
         NetworkHandler.sendToServer(new RequestDataPacket(menu.pos));
@@ -162,6 +170,18 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
                         Component.translatable("gui.broadcast.freq.add"), b -> addFrequency(), true));
                 addRenderableWidget(new AccentButton(x + 202, y + 142, 66, 18,
                         Component.translatable("gui.broadcast.freq.remove"), b -> removeFrequency(), false));
+
+                accessButton = new AccentButton(x + 12, y + 166, 110, 18, accessLabel(),
+                        b -> cycleAccess(), false);
+                addRenderableWidget(accessButton);
+                accessPasswordField = new EditBox(font, x + 126, y + 166, 94, 18,
+                        Component.translatable("gui.broadcast.access.password_hint"));
+                accessPasswordField.setMaxLength(64);
+                accessPasswordField.setHint(Component.translatable("gui.broadcast.access.password_hint"));
+                addRenderableWidget(accessPasswordField);
+                authButton = new AccentButton(x + 224, y + 166, 44, 18,
+                        Component.translatable("gui.broadcast.access.unlock"), b -> sendAuth(), false);
+                addRenderableWidget(authButton);
             }
             case DEVICES -> {
                 btnRefresh = new AccentButton(x + 202, y + 137, 58, 24,
@@ -292,6 +312,45 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
     }
 
     // ---------- 频率 ----------
+
+    private Component accessLabel() {
+        StationView view = ClientDataHolder.getView(menu.pos);
+        int mode = view == null ? 0 : view.accessMode();
+        String key = switch (mode) {
+            case 1 -> "gui.broadcast.access.private";
+            case 2 -> "gui.broadcast.access.password";
+            default -> "gui.broadcast.access.public";
+        };
+        return Component.translatable("gui.broadcast.access.mode", Component.translatable(key));
+    }
+
+    private void cycleAccess() {
+        StationView view = ClientDataHolder.getView(menu.pos);
+        if (view == null) return;
+        int next = (view.accessMode() + 1) % 3;
+        String password = accessPasswordField == null ? "" : accessPasswordField.getValue().trim();
+        if (next == 2 && password.isEmpty()) {
+            if (minecraft != null && minecraft.player != null) {
+                minecraft.player.displayClientMessage(
+                        Component.translatable("msg.broadcast.station_password_required"), true);
+            }
+            return;
+        }
+        NetworkHandler.sendToServer(new SetStationAccessPacket(menu.pos, next, password));
+    }
+
+    private void sendAuth() {
+        if (accessPasswordField == null) return;
+        NetworkHandler.sendToServer(new StationAuthPacket(menu.pos, accessPasswordField.getValue().trim()));
+    }
+
+    private void updateAccessWidgets() {
+        StationView view = ClientDataHolder.getView(menu.pos);
+        boolean passwordMode = view != null && view.accessMode() == 2;
+        if (accessButton != null) accessButton.setMessage(accessLabel());
+        if (accessPasswordField != null) accessPasswordField.setVisible(true);
+        if (authButton != null) authButton.visible = passwordMode;
+    }
 
     private void addFrequency() {
         if (freqField == null) return;
@@ -530,9 +589,9 @@ public class BroadcastStationScreen extends AbstractContainerScreen<BroadcastSta
         }
         drawScrollbar(g, lx + lw - 5, ly + 17, lh - 22, freqs.size(), visible, freqScroll);
 
-        g.drawString(font, Component.translatable("gui.broadcast.freq.hint1"), x + 12, y + 166, GuiTheme.FAINT, false);
-        g.drawString(font, Component.translatable("gui.broadcast.freq.hint2"), x + 12, y + 178, GuiTheme.FAINT, false);
-        g.drawString(font, Component.translatable("gui.broadcast.freq.hint3"), x + 12, y + 190, GuiTheme.FAINT, false);
+        updateAccessWidgets();
+        g.drawString(font, Component.translatable("gui.broadcast.freq.hint1"), x + 12, y + 190, GuiTheme.FAINT, false);
+        g.drawString(font, Component.translatable("gui.broadcast.freq.hint2"), x + 12, y + 202, GuiTheme.FAINT, false);
     }
 
     // ---- 设备 ----

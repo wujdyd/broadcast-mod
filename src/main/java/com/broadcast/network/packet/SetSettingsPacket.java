@@ -28,7 +28,8 @@ public record SetSettingsPacket(BlockPos station, int volumePercent, boolean red
             ServerPlayer player = ctx.getSender();
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
-            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be
+                    && be.canAccess(player)) {
                 if (p.volumePercent >= 0 && p.volumePercent <= 100) {
                     be.setVolume(p.volumePercent / 100F);
                 }

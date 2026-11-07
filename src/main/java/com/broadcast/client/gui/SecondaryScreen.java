@@ -31,7 +31,7 @@ public class SecondaryScreen extends Screen {
     private int selectedPlaylist = -1;
     private int libraryScroll;
     private int playlistPage;
-    private int gapValue = 60;
+    private int gapValue = 5;
     private int trackValue = 30;
     private long lastValueSend;
     private int mouseX;

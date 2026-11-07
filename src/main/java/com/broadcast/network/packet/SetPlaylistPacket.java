@@ -35,7 +35,8 @@ public record SetPlaylistPacket(BlockPos station, List<String> playlist) {
             ServerPlayer player = ctx.getSender();
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
-            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be
+                    && be.canConfigure(player)) {
                 if (be.getPlaylist().equals(p.playlist)) return;
                 if (!DebuggerItem.consumeDurability(player, DebuggerItem.COST_STATION)) return;
                 be.setPlaylist(p.playlist);

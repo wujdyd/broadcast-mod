@@ -84,6 +84,10 @@ public class BroadcastStationBlock extends Block implements EntityBlock {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide && level instanceof ServerLevel sl) {
             BroadcastRegistryData.get(sl).addStation(pos);
+            if (placer instanceof Player player
+                    && level.getBlockEntity(pos) instanceof BroadcastStationBlockEntity be) {
+                be.setOwner(player);
+            }
         }
     }
 

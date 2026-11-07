@@ -14,7 +14,7 @@ public record StationInfoPacket(BlockPos station, List<BlockPos> speakers, List<
                                 List<String> frequencies, int uploadPort,
                                 List<String> playlist, boolean playlistLoop, boolean playlistReverse,
                                 int playlistGap, int playlistTrackSeconds, int playlistIndex,
-                                boolean playlistPlaying) {
+                                boolean playlistPlaying, int accessMode, boolean passwordSet) {
 
     public static void encode(StationInfoPacket p, FriendlyByteBuf buf) {
         buf.writeBlockPos(p.station);
@@ -33,6 +33,8 @@ public record StationInfoPacket(BlockPos station, List<BlockPos> speakers, List<
         buf.writeInt(p.playlistTrackSeconds);
         buf.writeInt(p.playlistIndex);
         buf.writeBoolean(p.playlistPlaying);
+        buf.writeInt(p.accessMode);
+        buf.writeBoolean(p.passwordSet);
     }
 
     public static StationInfoPacket decode(FriendlyByteBuf buf) {
@@ -56,15 +58,17 @@ public record StationInfoPacket(BlockPos station, List<BlockPos> speakers, List<
         int trackSeconds = buf.readInt();
         int index = buf.readInt();
         boolean playing = buf.readBoolean();
+        int accessMode = buf.readInt();
+        boolean passwordSet = buf.readBoolean();
         return new StationInfoPacket(pos, speakers, mics, freqs, port, playlist, loop, reverse,
-                gap, trackSeconds, index, playing);
+                gap, trackSeconds, index, playing, accessMode, passwordSet);
     }
 
     public static void handle(StationInfoPacket p, Supplier<NetworkEvent.Context> ctxSup) {
         ctxSup.get().enqueueWork(() -> ClientDataHolder.setStationInfo(
                 p.station, p.speakers, p.mics, p.frequencies, p.uploadPort, p.playlist,
                 p.playlistLoop, p.playlistReverse, p.playlistGap, p.playlistTrackSeconds,
-                p.playlistIndex, p.playlistPlaying));
+                p.playlistIndex, p.playlistPlaying, p.accessMode, p.passwordSet));
         ctxSup.get().setPacketHandled(true);
     }
 }

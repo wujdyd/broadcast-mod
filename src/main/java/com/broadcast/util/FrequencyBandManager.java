@@ -115,10 +115,9 @@ public final class FrequencyBandManager {
         String f = FrequencyUtil.normalize(frequency);
         if (f.isEmpty()) return false;
         Band band = band(groupFor(player));
-        boolean digits = f.chars().allMatch(Character::isDigit);
-        if (digits) {
+        if (FrequencyUtil.isNumeric(f)) {
             try {
-                long n = Long.parseLong(f);
+                double n = Double.parseDouble(f);
                 return n >= band.start() && n <= band.end();
             } catch (NumberFormatException e) {
                 return false;

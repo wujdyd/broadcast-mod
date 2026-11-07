@@ -6,8 +6,9 @@
 
 把两个 jar 都放进 `mods/`：
 
-- `broadcast-0.0.3br-fix2-all.jar`（主模组）
-- `broadcast_media_support-1.0.0-fix1.jar`（本附属）
+- `broadcast-0.0.4br-all.jar`（主模组）
+- `broadcast_media_support-1.0.1.jar`（推荐）
+- `broadcast_media_support-1.0.0-fix2.jar`（客户端下载页版本）
 
 没有安装本附属时，主模组在播放视频链接时会提示：
 
@@ -60,8 +61,32 @@ cd media-support
 ..\tools\gradle-8.1.1\bin\gradle.bat build --no-daemon
 ```
 
-产物：`media-support/build/libs/broadcast_media_support-1.0.0-fix1.jar`
+产物：`media-support/build/libs/broadcast_media_support-1.0.1.jar`
 
 ## 许可
 
 MIT。下载的 yt-dlp/ffmpeg 不包含在本模组中，遵循其各自许可证。
+
+
+## 客户端下载请求页
+
+快捷键 `F9` 或客户端指令 `/broadcastmedia` 打开。页面可请求服务端下载 yt-dlp/ffmpeg，也可以打开官方下载页。
+
+## 其他模组 API
+
+其他模组依赖本附属后可使用：
+
+```java
+import com.broadcast.media.api.BroadcastMediaApi;
+import java.util.concurrent.CompletableFuture;
+
+CompletableFuture<String> future = BroadcastMediaApi.resolve(
+        serverPlayer, videoUrl, outputDirectory);
+```
+
+返回生成的音频文件名，位于 `outputDirectory` 中。异步回调里请用 `server.execute(...)` 回到主线程。
+
+## 版本
+
+- `1.0.0-fix2`：客户端下载请求页（服务端逻辑不变）
+- `1.0.1`：在 fix2 基础上增加公开 API、SSL 证书兼容与下载指令（推荐）

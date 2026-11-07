@@ -39,7 +39,7 @@ public final class ClientDataHolder {
                               List<BlockPos> mics, List<String> frequencies, int uploadPort,
                               List<String> playlist, boolean playlistLoop, boolean playlistReverse,
                               int playlistGap, int playlistTrackSeconds, int playlistIndex,
-                              boolean playlistPlaying) {
+                              boolean playlistPlaying, int accessMode, boolean passwordSet) {
     }
 
     public record DeviceView(BlockPos pos, String kind, String frequency, boolean powered,
@@ -83,23 +83,25 @@ public final class ClientDataHolder {
                 v == null ? List.of() : v.playlist(),
                 v != null && v.playlistLoop(),
                 v != null && v.playlistReverse(),
-                v == null ? 60 : v.playlistGap(),
+                v == null ? 5 : v.playlistGap(),
                 v == null ? 30 : v.playlistTrackSeconds(),
                 v == null ? 0 : v.playlistIndex(),
-                v != null && v.playlistPlaying()));
+                v != null && v.playlistPlaying(),
+                v == null ? 0 : v.accessMode(),
+                v != null && v.passwordSet()));
     }
 
     public static void setStationInfo(BlockPos station, List<BlockPos> speakers, List<BlockPos> mics,
                                       List<String> frequencies, int uploadPort,
                                       List<String> playlist, boolean playlistLoop, boolean playlistReverse,
                                       int playlistGap, int playlistTrackSeconds, int playlistIndex,
-                                      boolean playlistPlaying) {
+                                      boolean playlistPlaying, int accessMode, boolean passwordSet) {
         VIEWS.compute(station, (k, v) -> new StationView(
                 v == null ? List.of() : v.music(),
                 v == null ? List.of() : v.musicUids(),
                 speakers, mics, frequencies, uploadPort,
                 playlist, playlistLoop, playlistReverse, playlistGap, playlistTrackSeconds,
-                playlistIndex, playlistPlaying));
+                playlistIndex, playlistPlaying, accessMode, passwordSet));
     }
 
     public static DeviceView getDevice(BlockPos pos) {
@@ -112,6 +114,13 @@ public final class ClientDataHolder {
 
     public static PlayState getPlayState(BlockPos station) {
         return PLAY_STATES.get(station);
+    }
+
+    /** /stopsound:把客户端音频状态标记为停止,避免字幕继续显示。 */
+    public static void clearAudioState() {
+        PLAY_STATES.replaceAll((k, v) -> new PlayState(false, v.target(), v.url(),
+                v.volumePercent(), v.speakers()));
+        MIC_ACTIVE.replaceAll((k, v) -> false);
     }
 
     public static void setPlaybackState(BlockPos station, boolean playing, String target, boolean url,

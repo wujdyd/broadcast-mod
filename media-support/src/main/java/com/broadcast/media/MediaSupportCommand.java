@@ -25,11 +25,39 @@ public final class MediaSupportCommand {
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> d = event.getDispatcher();
         d.register(Commands.literal("broadcastmediasupport")
+                .then(Commands.literal("download").executes(MediaSupportCommand::download))
                 .then(Commands.literal("resolve")
                         .then(Commands.argument("pos", BlockPosArgument.blockPos())
                                 .then(Commands.argument("dir", StringArgumentType.word())
                                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                                 .executes(MediaSupportCommand::resolve))))));
+    }
+
+    private static int download(CommandContext<CommandSourceStack> ctx) {
+        ServerPlayer player;
+        try {
+            player = ctx.getSource().getPlayerOrException();
+        } catch (Exception e) {
+            return 0;
+        }
+        Thread thread = new Thread(() -> {
+            try {
+                MediaSupport.ensureTools(player);
+                if (player.getServer() != null) {
+                    player.getServer().execute(() -> player.displayClientMessage(
+                            Component.literal("媒体工具已就绪: yt-dlp + ffmpeg"), false));
+                }
+            } catch (Throwable t) {
+                if (player.getServer() != null) {
+                    player.getServer().execute(() -> player.displayClientMessage(
+                            Component.literal("媒体工具下载失败: " + t.getMessage()), false));
+                }
+            }
+        }, "BroadcastMediaSupport-Download");
+        thread.setDaemon(true);
+        thread.start();
+        player.displayClientMessage(Component.literal("已请求下载媒体工具…"), true);
+        return 1;
     }
 
     private static int resolve(CommandContext<CommandSourceStack> ctx) {

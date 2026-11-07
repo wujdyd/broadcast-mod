@@ -33,7 +33,8 @@ public record SetPlaylistSettingsPacket(BlockPos station, boolean loop, boolean 
             ServerPlayer player = ctx.getSender();
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
-            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be
+                    && be.canConfigure(player)) {
                 boolean changed = be.isPlaylistLoop() != p.loop
                         || be.isPlaylistReverse() != p.reverse
                         || be.getPlaylistGapSeconds() != p.gapSeconds

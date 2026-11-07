@@ -33,7 +33,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetworkHandler {
-    private static final String PROTOCOL = "0.0.3br-fix2";
+    private static final String PROTOCOL = "0.0.4br";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BroadcastMod.MODID, "main"),
@@ -52,6 +52,18 @@ public class NetworkHandler {
                 .encoder(com.broadcast.network.packet.MusicTrackEndPacket::encode)
                 .decoder(com.broadcast.network.packet.MusicTrackEndPacket::decode)
                 .consumerMainThread(com.broadcast.network.packet.MusicTrackEndPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.StopAllAudioPacket.class, id++)
+                .encoder(com.broadcast.network.packet.StopAllAudioPacket::encode)
+                .decoder(com.broadcast.network.packet.StopAllAudioPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.StopAllAudioPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.SetStationAccessPacket.class, id++)
+                .encoder(com.broadcast.network.packet.SetStationAccessPacket::encode)
+                .decoder(com.broadcast.network.packet.SetStationAccessPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.SetStationAccessPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.StationAuthPacket.class, id++)
+                .encoder(com.broadcast.network.packet.StationAuthPacket::encode)
+                .decoder(com.broadcast.network.packet.StationAuthPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.StationAuthPacket::handle).add();
         CHANNEL.messageBuilder(SetSettingsPacket.class, id++)
                 .encoder(SetSettingsPacket::encode).decoder(SetSettingsPacket::decode)
                 .consumerMainThread(SetSettingsPacket::handle).add();

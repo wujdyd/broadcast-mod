@@ -37,7 +37,8 @@ public record SetStationFrequenciesPacket(BlockPos station, List<String> frequen
             ServerPlayer player = ctx.getSender();
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
-            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be
+                    && be.canConfigure(player)) {
                 var next = FrequencyUtil.normalizeList(p.frequencies);
                 for (String f : next) {
                     if (!FrequencyBandManager.canUse(player, f)) {

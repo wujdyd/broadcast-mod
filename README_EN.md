@@ -1,10 +1,10 @@
 # Broadcast Mod (Minecraft 1.20.1 + Forge)
 
-School / railway-station style broadcast system. Version: **0.0.3br-fix2**
+School / railway-station style broadcast system. Version: **0.0.4br**
 
-Release jar: `build/libs/broadcast-0.0.3br-fix2-all.jar` (bundled MP3/FLAC decoder, reobfuscated).
+Release jar: `build/libs/broadcast-0.0.4br-all.jar` (bundled MP3/FLAC decoder, reobfuscated).
 
-## 0.0.3br-fix2 Highlights
+## 0.0.4br Highlights
 
 - Debugger durability is synced like a vanilla tool; no extra item tooltip lines.
 - ESC pause suspends OpenAL sources; adding a same-frequency speaker no longer restarts playback.
@@ -14,6 +14,9 @@ Release jar: `build/libs/broadcast-0.0.3br-fix2-all.jar` (bundled MP3/FLAC decod
 - Audio subtitle HUD; connected indicator light (brightness 5, particles only while linking).
 - Microphone fallback capture + chime before capture; 300-block portable mic range; failure messages near speakers.
 - Frequency permission bands and 100-block OP3/OP2 interference rules (`/? band`).
+- Frequencies support letters, integers and up to 3 decimals.
+- Station access modes: public/private/password; `/? find <frequency>` lookup; `/stopsound` compatibility.
+- Addon 1.0.1 adds public API and SSL compatibility; 1.0.0-fix2 adds the client download page.
 
 ## Blocks & Items
 
@@ -88,8 +91,9 @@ Video links are handled by the separate **Broadcast Media Support** addon; the m
 
 Install both:
 
-- `broadcast-0.0.3br-fix2-all.jar`
-- `broadcast_media_support-1.0.0-fix1.jar`
+- `broadcast-0.0.4br-all.jar`
+- `broadcast_media_support-1.0.1.jar`
+- or `broadcast_media_support-1.0.0-fix2.jar` (client download page)
 
 Without the addon the main mod reports exactly: `未安装broadcast media support，无法播放`.
 
@@ -97,7 +101,7 @@ The addon downloads yt-dlp (~17 MB) and ffmpeg (~80 MB) on first use into `confi
 
 ## Multiplayer "Invalid session"
 
-That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.3br-fix2`.
+That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.4br`.
 
 ## License
 

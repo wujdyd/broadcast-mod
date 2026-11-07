@@ -19,14 +19,50 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
 /** 自动获取/管理 yt-dlp 与 ffmpeg。 */
 final class ToolManager {
-    private static final HttpClient HTTP = HttpClient.newBuilder()
-            .followRedirects(HttpClient.Redirect.ALWAYS)
-            .connectTimeout(Duration.ofSeconds(30))
-            .build();
-
     private ToolManager() {
+    }
+
+    private static HttpClient http() {
+        try {
+            HttpClient.Builder b = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.ALWAYS)
+                    .connectTimeout(Duration.ofSeconds(30));
+            if (MediaSupportConfig.INSECURE_SSL.get()) {
+                TrustManager[] trustAll = new TrustManager[]{
+                        new X509TrustManager() {
+                            @Override
+                            public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                            }
+
+                            @Override
+                            public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                            }
+
+                            @Override
+                            public X509Certificate[] getAcceptedIssuers() {
+                                return new X509Certificate[0];
+                            }
+                        }
+                };
+                SSLContext context = SSLContext.getInstance("TLS");
+                context.init(null, trustAll, new SecureRandom());
+                b.sslContext(context);
+            }
+            return b.build();
+        } catch (Throwable t) {
+            return HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.ALWAYS)
+                    .connectTimeout(Duration.ofSeconds(30))
+                    .build();
+        }
     }
 
     record Tools(Path ytdlp, Path ffmpeg) {
@@ -117,7 +153,7 @@ final class ToolManager {
                 .header("User-Agent", "BroadcastMediaSupport/0.0.3")
                 .timeout(Duration.ofSeconds(60))
                 .GET().build();
-        String json = HTTP.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        String json = http().send(request, HttpResponse.BodyHandlers.ofString()).body();
         java.util.regex.Matcher m = java.util.regex.Pattern
                 .compile("\"zip\"\\s*:\\s*\\{[^}]*?\"url\"\\s*:\\s*\"([^\"]+)\"", java.util.regex.Pattern.DOTALL)
                 .matcher(json);
@@ -131,7 +167,7 @@ final class ToolManager {
                 .header("User-Agent", "BroadcastMediaSupport/0.0.3")
                 .timeout(Duration.ofMinutes(10))
                 .GET().build();
-        HttpResponse<Path> response = HTTP.send(request, HttpResponse.BodyHandlers.ofFile(tmp));
+        HttpResponse<Path> response = http().send(request, HttpResponse.BodyHandlers.ofFile(tmp));
         if (response.statusCode() / 100 != 2 || !Files.isRegularFile(tmp)) {
             delete(tmp);
             throw new IllegalStateException("下载失败 HTTP " + response.statusCode() + ": " + url);

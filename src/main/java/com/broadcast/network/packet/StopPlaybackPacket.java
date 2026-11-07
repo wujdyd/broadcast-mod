@@ -25,7 +25,8 @@ public record StopPlaybackPacket(BlockPos station) {
             ServerPlayer player = ctx.getSender();
             if (player == null || player.level() == null) return;
             if (!Access.canControl(player, p.station)) return;
-            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be) {
+            if (player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be
+                    && be.canAccess(player)) {
                 be.stopPlayback();
             }
         });

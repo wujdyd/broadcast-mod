@@ -18,12 +18,12 @@ public final class MediaSupport {
     }
 
     public static void ensureTools(ServerPlayer player) throws Exception {
-        ToolManager.ensure(player);
+        ToolManager.ensure(player, true);
     }
 
     public static String resolveBlocking(ServerPlayer player, String url, String outputDir) throws Exception {        Path dir = Path.of(outputDir);
         Files.createDirectories(dir);
-        ToolManager.Tools tools = ToolManager.ensure(player);
+        ToolManager.Tools tools = ToolManager.ensure(player, false);
         String hash = sha1(url).substring(0, 12);
         Path out = dir.resolve("video_" + hash + ".mp3");
         if (Files.isRegularFile(out)) return out.getFileName().toString();

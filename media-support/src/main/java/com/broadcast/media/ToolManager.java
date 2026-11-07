@@ -68,7 +68,7 @@ final class ToolManager {
     record Tools(Path ytdlp, Path ffmpeg) {
     }
 
-    static synchronized Tools ensure(ServerPlayer player) throws Exception {
+    static synchronized Tools ensure(ServerPlayer player, boolean allowDownload) throws Exception {
         Path dir = FMLPaths.CONFIGDIR.get().resolve("broadcast_media_support").resolve("tools");
         Files.createDirectories(dir);
         String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
@@ -95,8 +95,10 @@ final class ToolManager {
         boolean needYt = !Files.isRegularFile(yt);
         boolean needFf = !Files.isRegularFile(ff);
         if (!needYt && !needFf) return new Tools(yt, ff);
-        if (!MediaSupportConfig.AUTO_DOWNLOAD.get()) {
-            throw new IllegalStateException("缺少 yt-dlp/ffmpeg,且自动下载已关闭");
+        if (!allowDownload) {
+            throw new IllegalStateException(
+                    "缺少 yt-dlp/ffmpeg。请打开 /broadcastmedia 下载页并点击“请求服务端下载工具”，"
+                            + "或由管理员执行 /broadcastmediasupport download");
         }
 
         String arch = System.getProperty("os.arch", "").toLowerCase(Locale.ROOT);

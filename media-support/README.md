@@ -16,9 +16,17 @@
 未安装broadcast media support，无法播放
 ```
 
-## 自动下载工具
+## 下载工具（必须由用户主动请求）
 
-首次播放视频链接时，本附属会下载：
+为符合 Modrinth 的安全要求，**不会在播放视频时静默下载任何文件**。
+
+首次使用前，客户端按 `F9` 或输入 `/broadcastmedia` 打开下载请求页，点击“请求服务端下载工具”；也可以由管理员在服务器执行：
+
+```text
+/broadcastmediasupport download
+```
+
+确认后才会下载：
 
 - `yt-dlp`：约 17 MB
 - `ffmpeg`：约 80 MB（Windows 使用 gyan.dev essentials 构建）
@@ -29,20 +37,20 @@
 config/broadcast_media_support/tools/
 ```
 
-支持 Windows x64、Linux x64/arm64、macOS。下载完成后复用，不会每次重复下载。
+支持 Windows x64、Linux x64/arm64、macOS。下载完成后复用。
 
 配置：`config/broadcast_media_support-common.toml`
 
 ```toml
-[auto]
-download = true
-
 [paths]
 ytdlp = "auto"
 ffmpeg = "auto"
+
+[network]
+insecureSsl = true
 ```
 
-如果服务器不能联网，可以把工具放到任意位置并在 `paths` 中填写绝对路径，同时把 `download` 设为 `false`。
+如果服务器不能联网，可把工具放到任意位置并在 `paths` 中填写绝对路径。
 
 ## 指令
 

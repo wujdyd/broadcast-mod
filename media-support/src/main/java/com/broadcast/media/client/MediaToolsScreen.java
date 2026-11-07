@@ -57,12 +57,12 @@ public class MediaToolsScreen extends Screen {
         int x = (width - W) / 2;
         int y = (height - H) / 2;
         g.drawString(font, "Broadcast Media Support", x + 14, y + 10, 0xFFE8F0FF, false);
-        g.drawString(font, "视频音频解析工具下载", x + 14, y + 40, 0xFFFFD37A, false);
-        g.drawString(font, "首次播放视频链接时，服务器会自动下载：", x + 14, y + 58, 0xFFD0D8E0, false);
+        g.drawString(font, "下载媒体工具需要你的明确同意", x + 14, y + 40, 0xFFFFD37A, false);
+        g.drawString(font, "点击“请求服务端下载工具”后才会开始下载：", x + 14, y + 58, 0xFFD0D8E0, false);
         g.drawString(font, "· yt-dlp（约 17MB）", x + 22, y + 74, 0xFFD0D8E0, false);
         g.drawString(font, "· ffmpeg（约 80MB）", x + 22, y + 88, 0xFFD0D8E0, false);
         g.drawString(font, "下载目录：config/broadcast_media_support/tools/", x + 14, y + 108, 0xFF9FB0C0, false);
-        g.drawString(font, "如果自动下载失败，可点击下方按钮手动请求。", x + 14, y + 124, 0xFF9FB0C0, false);
+        g.drawString(font, "播放视频时不会静默下载任何文件。", x + 14, y + 124, 0xFF9FB0C0, false);
         g.drawString(font, "快捷键 F9 可再次打开此页。", x + 14, y + 136, 0xFF7F90A0, false);
     }
 

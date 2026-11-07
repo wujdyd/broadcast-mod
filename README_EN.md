@@ -97,7 +97,7 @@ Install both:
 
 Without the addon the main mod reports exactly: `未安装broadcast media support，无法播放`.
 
-The addon downloads yt-dlp (~17 MB) and ffmpeg (~80 MB) on first use into `config/broadcast_media_support/tools/` (Windows/Linux/macOS). For offline servers, set absolute paths in `config/broadcast_media_support-common.toml`.
+The addon never downloads silently while playing. Open the download request page with `F9`/`/broadcastmedia` and press the request button (or run `/broadcastmediasupport download`) to consent to downloading yt-dlp (~17 MB) and ffmpeg (~80 MB) into `config/broadcast_media_support/tools/`. For offline servers, set absolute paths in the config.
 
 ## Multiplayer "Invalid session"
 

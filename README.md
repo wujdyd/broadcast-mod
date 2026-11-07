@@ -221,7 +221,7 @@ speakerRadius = 18
 未安装broadcast media support，无法播放
 ```
 
-客户端按 `F9` 或输入 `/broadcastmedia` 可打开下载请求页。附属首次使用会自动下载 `yt-dlp`（约 17MB）和 `ffmpeg`（约 80MB）到 `config/broadcast_media_support/tools/`，支持 Windows / Linux / macOS。不能联网的服务器可手动放置工具并在 `config/broadcast_media_support-common.toml` 填绝对路径。
+客户端按 `F9` 或输入 `/broadcastmedia` 可打开下载请求页。**只有点击“请求服务端下载”或执行 `/broadcastmediasupport download` 后才会下载** `yt-dlp`（约 17MB）和 `ffmpeg`（约 80MB）到 `config/broadcast_media_support/tools/`，播放视频时不会静默下载。支持 Windows / Linux / macOS；不能联网的服务器可手动放置工具并在配置中填绝对路径。
 
 解析结果缓存为 `broadcast_music/video_<hash>.mp3`。普通音频直链和本地音乐不需要附属。
 

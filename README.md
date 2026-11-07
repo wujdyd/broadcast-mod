@@ -41,7 +41,7 @@
 - 新增 `/? find <频率>`，返回该频率是否被占用及占用设备。
 - 适配 `/stopsound`，会停止本模组创建的广播音源并隐藏字幕。
 - 调试器提示改为“需要拥有「广播调试器」”。
-- 视频解析失败时的证书路径问题由附属 1.0.1 的 SSL 兼容模式处理。
+- 视频解析失败时的证书路径问题由附属 1.0.1-fix2 的 SSL 兼容模式处理。
 
 
 
@@ -66,7 +66,7 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 - `build/libs/broadcast-0.0.4br-all.jar` —— **发布用**（含 JLayer/jFLAC）
 - `build/libs/broadcast-0.0.4br.jar` —— 不含内置依赖
 - `media-support/build/libs/broadcast_media_support-1.0.0-fix2.jar` —— 客户端下载页版本
-- `media-support/build/libs/broadcast_media_support-1.0.1.jar` —— 推荐：额外含 API、SSL 兼容、下载指令
+- `media-support/build/libs/broadcast_media_support-1.0.1-fix2.jar` —— 推荐：额外含 API、SSL 兼容、下载指令
 
 ---
 
@@ -212,7 +212,7 @@ speakerRadius = 18
 安装：
 
 - `broadcast-0.0.4br-all.jar`（主模组）
-- `broadcast_media_support-1.0.1.jar`（推荐附属，放在 `mods/`）
+- `broadcast_media_support-1.0.1-fix2.jar`（推荐附属，放在 `mods/`）
 - 或 `broadcast_media_support-1.0.0-fix2.jar`（客户端下载页版本）
 
 未安装附属时，播放视频链接会提示：

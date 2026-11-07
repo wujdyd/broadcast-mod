@@ -19,6 +19,10 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
+import java.util.UUID;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -27,7 +31,14 @@ import java.security.cert.X509Certificate;
 
 /** 自动获取/管理 yt-dlp 与 ffmpeg。 */
 final class ToolManager {
+    /** 只有用户主动点击下载页/执行下载指令时,才为本次会话写入一次性授权。 */
+    private static final Set<UUID> DOWNLOAD_CONSENT = ConcurrentHashMap.newKeySet();
+
     private ToolManager() {
+    }
+
+    static void authorizeDownload(ServerPlayer player) {
+        if (player != null) DOWNLOAD_CONSENT.add(player.getUUID());
     }
 
     private static HttpClient http() {
@@ -99,6 +110,9 @@ final class ToolManager {
             throw new IllegalStateException(
                     "缺少 yt-dlp/ffmpeg。请打开 /broadcastmedia 下载页并点击“请求服务端下载工具”，"
                             + "或由管理员执行 /broadcastmediasupport download");
+        }
+        if (!DOWNLOAD_CONSENT.remove(player.getUUID())) {
+            throw new IllegalStateException("下载媒体工具需要用户明确授权");
         }
 
         String arch = System.getProperty("os.arch", "").toLowerCase(Locale.ROOT);

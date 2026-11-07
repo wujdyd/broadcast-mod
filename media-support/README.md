@@ -7,7 +7,7 @@
 把两个 jar 都放进 `mods/`：
 
 - `broadcast-0.0.4br-all.jar`（主模组）
-- `broadcast_media_support-1.0.1.jar`（推荐）
+- `broadcast_media_support-1.0.1-fix2.jar`（推荐）
 - `broadcast_media_support-1.0.0-fix2.jar`（客户端下载页版本）
 
 没有安装本附属时，主模组在播放视频链接时会提示：
@@ -69,7 +69,7 @@ cd media-support
 ..\tools\gradle-8.1.1\bin\gradle.bat build --no-daemon
 ```
 
-产物：`media-support/build/libs/broadcast_media_support-1.0.1.jar`
+产物：`media-support/build/libs/broadcast_media_support-1.0.1-fix2.jar`
 
 ## 许可
 
@@ -97,4 +97,4 @@ CompletableFuture<String> future = BroadcastMediaApi.resolve(
 ## 版本
 
 - `1.0.0-fix2`：客户端下载请求页（服务端逻辑不变）
-- `1.0.1`：在 fix2 基础上增加公开 API、SSL 证书兼容与下载指令（推荐）
+- `1.0.1-fix2`：在 fix2 基础上增加公开 API、SSL 证书兼容与下载指令（推荐）

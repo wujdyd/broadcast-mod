@@ -37,15 +37,4 @@ public final class BroadcastMediaApi {
     public static String resolveBlocking(ServerPlayer player, String url, Path outputDir) throws Exception {
         return MediaSupport.resolveBlocking(player, url, outputDir.toString());
     }
-
-    /** 请求下载/检查 yt-dlp 与 ffmpeg;异步执行。 */
-    public static CompletableFuture<Void> requestTools(ServerPlayer player) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                MediaSupport.ensureTools(player);
-            } catch (Exception e) {
-                throw new CompletionException(e);
-            }
-        });
-    }
 }

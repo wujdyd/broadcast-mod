@@ -42,6 +42,7 @@ public final class MediaSupportCommand {
         }
         Thread thread = new Thread(() -> {
             try {
+                ToolManager.authorizeDownload(player);
                 MediaSupport.ensureTools(player);
                 if (player.getServer() != null) {
                     player.getServer().execute(() -> player.displayClientMessage(

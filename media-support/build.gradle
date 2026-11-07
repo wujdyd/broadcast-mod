@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.broadcast.media'
-version = '1.0.1'
+version = '1.0.1-fix2'
 
 base {
     archivesName = 'broadcast_media_support'
@@ -47,6 +47,7 @@ tasks.withType(JavaCompile).configureEach {
 
 jar {
     from('LICENSE')
+    from('SAFETY.md')
     manifest {
         attributes([
                 'Specification-Title'     : 'broadcast_media_support',

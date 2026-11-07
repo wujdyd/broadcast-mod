@@ -16,7 +16,7 @@ Release jar: `build/libs/broadcast-0.0.4br-all.jar` (bundled MP3/FLAC decoder, r
 - Frequency permission bands and 100-block OP3/OP2 interference rules (`/? band`).
 - Frequencies support letters, integers and up to 3 decimals.
 - Station access modes: public/private/password; `/? find <frequency>` lookup; `/stopsound` compatibility.
-- Addon 1.0.1 adds public API and SSL compatibility; 1.0.0-fix2 adds the client download page.
+- Addon 1.0.1-fix2 adds public API and SSL compatibility; 1.0.0-fix2 adds the client download page.
 
 ## Blocks & Items
 
@@ -92,7 +92,7 @@ Video links are handled by the separate **Broadcast Media Support** addon; the m
 Install both:
 
 - `broadcast-0.0.4br-all.jar`
-- `broadcast_media_support-1.0.1.jar`
+- `broadcast_media_support-1.0.1-fix2.jar`
 - or `broadcast_media_support-1.0.0-fix2.jar` (client download page)
 
 Without the addon the main mod reports exactly: `未安装broadcast media support，无法播放`.

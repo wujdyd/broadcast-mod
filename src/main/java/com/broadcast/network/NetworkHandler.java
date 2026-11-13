@@ -33,7 +33,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetworkHandler {
-    private static final String PROTOCOL = "0.0.4br";
+    private static final String PROTOCOL = "0.0.1c";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BroadcastMod.MODID, "main"),
@@ -97,6 +97,22 @@ public class NetworkHandler {
         CHANNEL.messageBuilder(DeleteMusicPacket.class, id++)
                 .encoder(DeleteMusicPacket::encode).decoder(DeleteMusicPacket::decode)
                 .consumerMainThread(DeleteMusicPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.RenameMusicPacket.class, id++)
+                .encoder(com.broadcast.network.packet.RenameMusicPacket::encode)
+                .decoder(com.broadcast.network.packet.RenameMusicPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.RenameMusicPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.RequestPresetsPacket.class, id++)
+                .encoder(com.broadcast.network.packet.RequestPresetsPacket::encode)
+                .decoder(com.broadcast.network.packet.RequestPresetsPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.RequestPresetsPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.ApplyPresetPacket.class, id++)
+                .encoder(com.broadcast.network.packet.ApplyPresetPacket::encode)
+                .decoder(com.broadcast.network.packet.ApplyPresetPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.ApplyPresetPacket::handle).add();
+        CHANNEL.messageBuilder(com.broadcast.network.packet.PresetListPacket.class, id++)
+                .encoder(com.broadcast.network.packet.PresetListPacket::encode)
+                .decoder(com.broadcast.network.packet.PresetListPacket::decode)
+                .consumerMainThread(com.broadcast.network.packet.PresetListPacket::handle).add();
         CHANNEL.messageBuilder(SetPortableMicSettingsPacket.class, id++)
                 .encoder(SetPortableMicSettingsPacket::encode).decoder(SetPortableMicSettingsPacket::decode)
                 .consumerMainThread(SetPortableMicSettingsPacket::handle).add();

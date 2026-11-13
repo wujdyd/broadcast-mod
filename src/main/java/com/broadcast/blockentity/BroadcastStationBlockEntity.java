@@ -69,6 +69,12 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     private int playlistPhase;
     private long playlistPhaseStart;
     private boolean playlistActive;
+    private final List<String> presetTracks = new ArrayList<>();
+    private boolean presetLoop = true;
+    private String presetOrder = "z";
+    private int presetIndex;
+    private boolean presetActive;
+    private long presetNextAt;
 
     private int micSuspend;
     private boolean micResumePending;
@@ -373,11 +379,91 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
 
     /** 播放列表当前曲目自然结束:切到间隔,再由 tickPlaylist 播放下一首。 */
     public void onTrackEnded() {
+        if (presetActive) {
+            stopPlayback();
+            presetNextAt = level == null ? 0 : level.getGameTime() + 100L;
+            broadcastInfo();
+            return;
+        }
         if (!playlistActive || !playing) return;
         stopPlayback();
         playlistPhase = 0;
         if (level != null) playlistPhaseStart = level.getGameTime();
         broadcastInfo();
+    }
+
+    /** 应用预设:曲目可为音乐库 UID/文件名/http 直链。 */
+    public void startPreset(java.util.List<String> tracks, boolean loop, String order) {
+        presetTracks.clear();
+        if (tracks != null) {
+            for (String s : tracks) {
+                if (s != null && !s.isBlank()) presetTracks.add(s.trim());
+            }
+        }
+        presetLoop = loop;
+        presetOrder = order == null ? "z" : order.toLowerCase(java.util.Locale.ROOT);
+        presetIndex = 0;
+        presetActive = !presetTracks.isEmpty();
+        presetNextAt = 0;
+        stopPlayback();
+        if (presetActive) startPresetNext();
+        broadcastInfo();
+    }
+
+    public void stopPreset() {
+        presetActive = false;
+        stopPlayback();
+        broadcastInfo();
+    }
+
+    private void startPresetNext() {
+        if (!presetActive || presetTracks.isEmpty()) {
+            presetActive = false;
+            return;
+        }
+        if (presetIndex >= presetTracks.size()) {
+            if (!presetLoop) {
+                presetActive = false;
+                stopPlayback();
+                return;
+            }
+            presetIndex = 0;
+        }
+        for (int tries = 0; tries < presetTracks.size(); tries++) {
+            int idx;
+            if ("d".equals(presetOrder)) {
+                idx = Math.floorMod(presetTracks.size() - 1 - (presetIndex % presetTracks.size()), presetTracks.size());
+            } else if ("s".equals(presetOrder)) {
+                idx = java.util.concurrent.ThreadLocalRandom.current().nextInt(presetTracks.size());
+            } else {
+                idx = presetIndex % presetTracks.size();
+            }
+            presetIndex = (presetIndex + 1) % Math.max(1, presetTracks.size());
+            String entry = presetTracks.get(idx);
+            boolean url = entry.startsWith("http://") || entry.startsWith("https://");
+            String target = entry;
+            if (!url) {
+                String byUid = MusicLibrary.get().nameFor(entry);
+                if (byUid != null) target = byUid;
+                if (!UploadHttpServer.hasMusicFile(target)) continue;
+            }
+            startPlayback(target, url);
+            presetNextAt = (level == null ? 0 : level.getGameTime()) + playlistTrackSeconds * 20L;
+            return;
+        }
+        presetActive = false;
+        stopPlayback();
+    }
+
+    private void tickPreset() {
+        if (!presetActive || micSuspend > 0) return;
+        long now = level == null ? 0 : level.getGameTime();
+        if (!playing && now >= presetNextAt) {
+            startPresetNext();
+        } else if (playing && now >= presetNextAt) {
+            // 客户端没有回报结束时,用“最长单首”兜底
+            onTrackEnded();
+        }
     }
 
     public void stopPlayback() {
@@ -390,6 +476,9 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     /** 话筒讲话时暂停音乐。 */
     public void suspendForMic() {
         micSuspend++;
+        if (presetActive) {
+            presetNextAt = Long.MAX_VALUE;
+        }
         if (playing) {
             micResumePending = true;
             if (playlistLoop && playlistActive) {
@@ -404,6 +493,11 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     public void resumeAfterMic() {
         if (micSuspend > 0) micSuspend--;
         if (micSuspend != 0) return;
+        if (presetActive) {
+            presetNextAt = level == null ? 0 : level.getGameTime() + 100L;
+            micResumePending = false;
+            return;
+        }
         if (playlistLoop) {
             // 交给播放列表计时器重新开始(避免和列表计时冲突)
             playlistPhase = 0;
@@ -442,7 +536,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
     /** 当前播放状态(供 GUI 打开时同步)。 */
     public PlaybackStatePacket statePacket() {
         return new PlaybackStatePacket(worldPosition, playing, target, targetIsUrl,
-                !playlistActive, Math.round(volume * 100), getSpeakers());
+                !playlistActive && !presetActive, Math.round(volume * 100), getSpeakers());
     }
 
     public StationInfoPacket infoPacket() {
@@ -488,7 +582,7 @@ public class BroadcastStationBlockEntity extends BlockEntity implements MenuProv
                 }
             }
         }
-        tickPlaylist();
+        tickPreset();
     }
 
     private void tickPlaylist() {

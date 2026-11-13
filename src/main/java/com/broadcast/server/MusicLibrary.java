@@ -168,6 +168,34 @@ public final class MusicLibrary {
         return name;
     }
 
+    /** 重命名音乐库文件;返回新文件名,失败返回 null。 */
+    public synchronized String renameByUid(String uid, String rawName) {
+        String oldName = uidToName.get(uid);
+        if (oldName == null) return null;
+        String newName = NameUtil.sanitizeFileName(rawName);
+        if (newName.isEmpty()) return null;
+        if (!NameUtil.isPlayableExtension(newName)) {
+            String ext = NameUtil.extension(oldName);
+            if (!ext.isEmpty()) newName = newName + "." + ext;
+        }
+        if (!NameUtil.isPlayableExtension(newName)) return null;
+        if (newName.equals(oldName)) return newName;
+        if (nameToUid.containsKey(newName)) return null;
+        try {
+            Files.move(UploadHttpServer.musicDir().resolve(oldName),
+                    UploadHttpServer.musicDir().resolve(newName),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            BroadcastMod.LOGGER.warn("重命名音乐失败 {} -> {}: {}", oldName, newName, e.getMessage());
+            return null;
+        }
+        uidToName.put(uid, newName);
+        nameToUid.remove(oldName);
+        nameToUid.put(newName, uid);
+        save();
+        return newName;
+    }
+
     private void save() {
         try {
             Files.createDirectories(UploadHttpServer.musicDir());

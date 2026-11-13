@@ -32,6 +32,7 @@ public record RequestDataPacket(BlockPos station) {
             if (!Access.canControl(player, p.station)) return;
             if (!(player.level().getBlockEntity(p.station) instanceof BroadcastStationBlockEntity be)) return;
 
+            MusicLibrary.get().reload();
             List<String> uids = new ArrayList<>();
             List<String> files = new ArrayList<>();
             for (MusicLibrary.Entry entry : MusicLibrary.get().entries()) {

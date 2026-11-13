@@ -6,7 +6,7 @@
 
 把两个 jar 都放进 `mods/`：
 
-- `broadcast-0.0.4br-all.jar`（主模组）
+- `broadcast-0.0.1c-all.jar`（主模组）
 - `broadcast_media_support-1.0.1-fix2.jar`（推荐）
 - `broadcast_media_support-1.0.0-fix2.jar`（客户端下载页版本）
 

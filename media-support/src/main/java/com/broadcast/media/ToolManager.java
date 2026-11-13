@@ -126,7 +126,7 @@ final class ToolManager {
                     ? "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux_aarch64"
                     : "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux");
             notify(player, "正在下载 yt-dlp…");
-            download(url, yt);
+            download(url, yt, player, "yt-dlp");
             setExecutable(yt);
         }
         if (needFf) {
@@ -146,7 +146,7 @@ final class ToolManager {
             }
             notify(player, "正在下载 ffmpeg(约 80MB)…");
             Path archive = dir.resolve(zip ? "ffmpeg.zip" : "ffmpeg.tar.xz");
-            download(url, archive);
+            download(url, archive, player, "ffmpeg");
             Path temp = Files.createTempDirectory(dir, "ffmpeg-");
             try {
                 if (zip) unzip(archive, ff);
@@ -177,18 +177,46 @@ final class ToolManager {
         return m.group(1).replace("\\/", "/");
     }
 
-    private static void download(String url, Path target) throws Exception {        Path tmp = target.resolveSibling(target.getFileName() + ".part");
+    private static void download(String url, Path target, ServerPlayer player, String label) throws Exception {
+        Path tmp = target.resolveSibling(target.getFileName() + ".part");
         Files.deleteIfExists(tmp);
         HttpRequest request = HttpRequest.newBuilder(URI.create(url))
-                .header("User-Agent", "BroadcastMediaSupport/0.0.3")
+                .header("User-Agent", "BroadcastMediaSupport/1.0.1-fix2")
                 .timeout(Duration.ofMinutes(10))
                 .GET().build();
-        HttpResponse<Path> response = http().send(request, HttpResponse.BodyHandlers.ofFile(tmp));
-        if (response.statusCode() / 100 != 2 || !Files.isRegularFile(tmp)) {
+        HttpResponse<java.io.InputStream> response = http().send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() / 100 != 2) {
             delete(tmp);
             throw new IllegalStateException("下载失败 HTTP " + response.statusCode() + ": " + url);
         }
+        long total = response.headers().firstValueAsLong("Content-Length").orElse(-1);
+        long done = 0;
+        long lastNotify = 0;
+        byte[] buf = new byte[64 * 1024];
+        try (var in = response.body(); var out = Files.newOutputStream(tmp)) {
+            int n;
+            while ((n = in.read(buf)) > 0) {
+                out.write(buf, 0, n);
+                done += n;
+                if (done - lastNotify >= 2 * 1024 * 1024L) {
+                    lastNotify = done;
+                    if (total > 0) {
+                        int pct = (int) Math.min(99, done * 100 / total);
+                        notify(player, label + " 下载中 " + pct + "% ("
+                                + String.format(java.util.Locale.ROOT, "%.1f", done / 1048576.0) + "MB)");
+                    } else {
+                        notify(player, label + " 下载中 "
+                                + String.format(java.util.Locale.ROOT, "%.1f", done / 1048576.0) + "MB");
+                    }
+                }
+            }
+        }
+        if (!Files.isRegularFile(tmp)) {
+            delete(tmp);
+            throw new IllegalStateException("下载失败: " + url);
+        }
         Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING);
+        notify(player, label + " 下载完成");
     }
 
     private static void unzip(Path archive, Path target) throws Exception {

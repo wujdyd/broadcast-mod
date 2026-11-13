@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.broadcast'
-version = '0.0.4br'
+version = '0.0.1c'
 
 base {
     archivesName = 'broadcast'
@@ -70,11 +70,11 @@ jar {
     manifest {
         attributes([
                 'Specification-Title'     : 'broadcast',
-                'Specification-Vendor'    : 'Ruyi Workbench',
+                'Specification-Vendor'    : 'NO',
                 'Specification-Version'   : '1',
                 'Implementation-Title'    : project.name,
                 'Implementation-Version'  : project.version,
-                'Implementation-Vendor'   : 'Ruyi Workbench',
+                'Implementation-Vendor'   : 'NO',
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }

@@ -40,6 +40,7 @@ public class CommonEvents {
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
         com.broadcast.util.FrequencyBandManager.load(event.getServer());
+        com.broadcast.server.PresetManager.load(event.getServer());
         MusicLibrary.get().reload();
         UploadHttpServer.start(event.getServer());
     }
@@ -94,6 +95,23 @@ public class CommonEvents {
         if (!stopSound) return;
         var server = parsed.getContext().getSource().getServer();
         if (server == null) return;
+        for (ServerLevel level : server.getAllLevels()) {
+            BroadcastRegistryData reg = BroadcastRegistryData.get(level);
+            for (BlockPos pos : new ArrayList<>(reg.getStations())) {
+                if (level.isLoaded(pos)
+                        && level.getBlockEntity(pos) instanceof BroadcastStationBlockEntity station
+                        && station.isPlaying()) {
+                    station.stopPreset();
+                }
+            }
+            for (BlockPos pos : new ArrayList<>(reg.getMicrophones())) {
+                if (level.isLoaded(pos)
+                        && level.getBlockEntity(pos) instanceof MicrophoneBlockEntity mic
+                        && mic.isActive()) {
+                    mic.forceStop();
+                }
+            }
+        }
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             com.broadcast.network.NetworkHandler.sendToPlayer(player,
                     new com.broadcast.network.packet.StopAllAudioPacket());

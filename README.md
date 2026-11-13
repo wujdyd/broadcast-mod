@@ -1,8 +1,8 @@
 # 广播站 Broadcast（Minecraft 1.20.1 + Forge 模组）
 
-校园 / 火车站风格广播系统模组。当前版本：**0.0.4br**
+校园 / 火车站风格广播系统模组。当前版本：**0.0.1c**
 
-构建产物：`build/libs/broadcast-0.0.4br-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
+构建产物：`build/libs/broadcast-0.0.1c-all.jar`（内含 MP3/FLAC 解码器，已 reobf，直接放进 `mods/`）。
 
 ---
 
@@ -17,16 +17,16 @@
 | 广播调试器 | 唯一打开各 GUI 的工具；450 点耐久；可合成 |
 | 广播指示灯 | 任意位置可放，当同维度有话筒/广播站广播时亮起 |
 
-其他：频率制、多频率同步、音乐搜索、音乐 UID、删除确认、定时播放列表（二级 GUI）、原生 MP3/FLAC、网络视频音频、音频字幕、可配置声音半径、配方书自动解锁。
+其他：频率制、多频率同步、音乐搜索、音乐 UID、删除/重命名、预设（可搜索 GUI）、原生 MP3/FLAC、网络视频音频、音频字幕、动态声音半径、配方书自动解锁。
 
 ---
 
-## 0.0.4br 更新
+## 0.0.1c 更新
 
 - 调试器耐久与客户端同步，损坏时播放原版工具损坏音效；物品名称下方不再显示额外小字。
 - 单人 ESC 暂停时挂起 OpenAL 音源，恢复后继续。
 - 播放中新增同频率广播器只追加音源，不重置播放进度。
-- 播放列表改为真实曲目结束驱动（客户端播放完当前曲目后通知服务端切歌）；二级 GUI 固定显示“正在播放”，下方“将要播放”每页 5 首，页数不限。
+- 取消旧播放列表；改用 `/? listed` 预设和可搜索的预设选择 GUI。
 - 支持 FLAC（内置 jFLAC，8/16 bit）。
 - 网络音乐页支持视频链接：服务器安装 `yt-dlp` 与 `ffmpeg` 后，可解析 B站/抖音/快手/YouTube/TikTok 等平台并转成音频播放。
 - 播放时 HUD 底部显示音频字幕（曲名 / 话筒广播中）。
@@ -42,6 +42,16 @@
 - 适配 `/stopsound`，会停止本模组创建的广播音源并隐藏字幕。
 - 调试器提示改为“需要拥有「广播调试器」”。
 - 视频解析失败时的证书路径问题由附属 1.0.1-fix2 的 SSL 兼容模式处理。
+- GUI 改为原版灰色风格；频率输入框提示文字改为浅色，避免过暗和文字穿模。
+- 公开/私人/密码改为三个独立按钮；密码模式才显示密码框、设置和解锁按钮，修复私人模式无法切回公开。
+- 播放横幅只在开始/切歌后显示约 6 秒。
+- `/stopsound` 同时停止广播站、话筒并熄灭指示灯。
+- 新增 `/? sre` 强制重启广播服务。
+- 新增 `/? listed <音乐1>*...*<音乐n> <yes|no> <z|d|s> <预设名>`；`/? listed <预设名> delete|save`。
+- 音响距离改为 `15 + 数量/3`，音量按 `数量 + √数量` 动态计算。
+- 音乐库支持重命名；解析出的网络歌曲会在下次打开 GUI 时重新扫描进音乐库。
+- 附属下载工具时在动作栏显示百分比/已下载 MB。
+- 版本号 **0.0.1c**。
 
 
 
@@ -63,8 +73,8 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 产物：
 
-- `build/libs/broadcast-0.0.4br-all.jar` —— **发布用**（含 JLayer/jFLAC）
-- `build/libs/broadcast-0.0.4br.jar` —— 不含内置依赖
+- `build/libs/broadcast-0.0.1c-all.jar` —— **发布用**（含 JLayer/jFLAC）
+- `build/libs/broadcast-0.0.1c.jar` —— 不含内置依赖
 - `media-support/build/libs/broadcast_media_support-1.0.0-fix2.jar` —— 客户端下载页版本
 - `media-support/build/libs/broadcast_media_support-1.0.1-fix2.jar` —— 推荐：额外含 API、SSL 兼容、下载指令
 
@@ -73,7 +83,7 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 ## 安装
 
 1. Forge 1.20.1（47.x）。
-2. 把 `broadcast-0.0.4br-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
+2. 把 `broadcast-0.0.1c-all.jar` 放进客户端与服务端的 `mods/`（两边同版本）。
 3. 许可证：jar 内 `LICENSE`（MIT；内置 JLayer 与 jFLAC 为 LGPL-2.1）。
 
 ---
@@ -211,7 +221,7 @@ speakerRadius = 18
 
 安装：
 
-- `broadcast-0.0.4br-all.jar`（主模组）
+- `broadcast-0.0.1c-all.jar`（主模组）
 - `broadcast_media_support-1.0.1-fix2.jar`（推荐附属，放在 `mods/`）
 - 或 `broadcast_media_support-1.0.0-fix2.jar`（客户端下载页版本）
 
@@ -233,10 +243,10 @@ speakerRadius = 18
 
 1. 离线朋友服：服务端 `online-mode=false`；
 2. 正版服：正版账号，且能访问 `sessionserver.mojang.com`；
-3. 客户端与服务端安装同一个 `broadcast-0.0.4br-all.jar`；
+3. 客户端与服务端安装同一个 `broadcast-0.0.1c-all.jar`；
 4. 局域网由主机账号验证。
 
-网络协议：`0.0.4br`（版本不一致会被 Forge 拒绝）。
+网络协议：`0.0.1c`（版本不一致会被 Forge 拒绝）。
 
 ---
 

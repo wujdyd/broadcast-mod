@@ -2,7 +2,6 @@ package com.broadcast.client.audio;
 
 import com.broadcast.BroadcastMod;
 import com.broadcast.client.ClientDataHolder;
-import com.broadcast.config.BroadcastConfig;
 import com.broadcast.network.NetworkHandler;
 import com.broadcast.network.packet.RequestFilePacket;
 import com.broadcast.util.NameUtil;
@@ -54,17 +53,24 @@ public final class ClientAudioManager {
 
     public static void startMusic(BlockPos station, String target, boolean url, boolean loop,
                                   float volume, List<BlockPos> speakers) {
+        alBroken = false;
         stopMusic(station);
         if (speakers.isEmpty()) return;
         MusicSession s = new MusicSession(station, target, url, loop, volume, speakers);
         MusicSession old = MUSIC.put(station, s);
-        if (old != null) old.stop();
+        if (old != null) {
+            old.stop();
+            old.closeNow();
+        }
         s.start();
     }
 
     public static void stopMusic(BlockPos station) {
         MusicSession s = MUSIC.remove(station);
-        if (s != null) s.stop();
+        if (s != null) {
+            s.stop();
+            s.closeNow();
+        }
     }
 
     public static boolean isPlaying(BlockPos station, String target) {
@@ -94,6 +100,7 @@ public final class ClientAudioManager {
     }
 
     public static void startMic(BlockPos mic, float volume, List<BlockPos> speakers) {
+        alBroken = false;
         stopMic(mic);
         if (speakers.isEmpty()) return;
         MICS.put(mic, new MicSink(mic, volume, speakers));
@@ -195,17 +202,19 @@ public final class ClientAudioManager {
 
     // ---------- 距离衰减 ----------
 
-    /** 以玩家眼睛位置计算该喇叭的增益,超出配置半径后静音。 */
-    private static float distanceGain(BlockPos speaker, float volume) {
+    /** 动态距离:y = 15 + x/3;动态音量:w = x + sqrt(x)(x 为广播器数量)。 */
+    private static float distanceGain(BlockPos speaker, float volume, int speakerCount) {
         Player player = Minecraft.getInstance().player;
         if (player == null) return 0F;
-        double radius = Math.max(4D, BroadcastConfig.speakerRadius());
+        double x = Math.max(0, speakerCount);
+        double radius = 15.0D + x / 3.0D;
         double dist = Math.sqrt(player.getEyePosition().distanceToSqr(
                 speaker.getX() + 0.5D, speaker.getY() + 0.5D, speaker.getZ() + 0.5D));
         if (dist >= radius) return 0F;
         double inner = radius * 0.45D;
-        if (dist <= inner) return volume;
-        return (float) (volume * (radius - dist) / (radius - inner));
+        float distancePart = dist <= inner ? 1F : (float) ((radius - dist) / (radius - inner));
+        double w = Math.min(4.0D, x + Math.sqrt(x));
+        return Math.min(4.0F, volume * distancePart * (float) w);
     }
 
     // ---------- OpenAL 音源 ----------
@@ -234,7 +243,7 @@ public final class ClientAudioManager {
 
     private static List<Src> openSources(List<BlockPos> speakers) {
         List<Src> out = new ArrayList<>();
-        float radius = (float) Math.max(4D, BroadcastConfig.speakerRadius());
+        float radius = 1000F;
         for (BlockPos sp : speakers) {
             try {
                 int src = AL10.alGenSources();
@@ -346,6 +355,14 @@ public final class ClientAudioManager {
             running = false;
             Thread t = feeder;
             if (t != null) t.interrupt();
+            closeNow();
+        }
+
+        /** 立即释放 OpenAL 音源,避免快速切歌时音源泄漏导致后续无声。 */
+        void closeNow() {
+            closeSources(sources);
+            queue.clear();
+            queuedBytes.set(0);
         }
 
         // ---- 解码线程 ----
@@ -483,7 +500,7 @@ public final class ClientAudioManager {
                         if (AL10.alGetSourcei(src.id, AL10.AL_SOURCE_STATE) != AL10.AL_PLAYING) {
                             AL10.alSourcePlay(src.id);
                         }
-                        AL10.alSourcef(src.id, AL10.AL_GAIN, distanceGain(src.pos, volume));
+                        AL10.alSourcef(src.id, AL10.AL_GAIN, distanceGain(src.pos, volume, speakers.size()));
                     } catch (Throwable ignored) {
                     }
                 }
@@ -566,7 +583,7 @@ public final class ClientAudioManager {
                         if (AL10.alGetSourcei(src.id, AL10.AL_SOURCE_STATE) != AL10.AL_PLAYING) {
                             AL10.alSourcePlay(src.id);
                         }
-                        AL10.alSourcef(src.id, AL10.AL_GAIN, distanceGain(src.pos, volume));
+                        AL10.alSourcef(src.id, AL10.AL_GAIN, distanceGain(src.pos, volume, sources.size()));
                     } else if (idle > 2500 && AL10.alGetSourcei(src.id, AL10.AL_SOURCE_STATE) == AL10.AL_PLAYING) {
                         AL10.alSourceStop(src.id);
                     }

@@ -195,5 +195,18 @@
   "msg.broadcast.station_wrong_password": "密码错误",
   "msg.broadcast.station_unlocked": "广播站已解锁",
   "command.broadcast.help.find": "/? find <频率> - 查询该频率被谁占用",
-  "command.broadcast.find_invalid": "频率格式不正确"
+  "command.broadcast.find_invalid": "频率格式不正确",
+  "gui.broadcast.access.set": "确定",
+  "command.broadcast.help.sre": "/? sre - 强制重启广播模组服务(OP3)",
+  "command.broadcast.sre_done": "广播模组服务已强制重启",
+  "command.broadcast.help.listed": "/? listed <音乐1>*...*<音乐n> <yes|no> <z|d|s> <预设名> ; /? listed <预设名> delete|save",
+  "command.broadcast.listed_invalid": "list 格式不正确",
+  "gui.broadcast.preset.open": "预设",
+  "gui.broadcast.preset.title": "广播预设",
+  "gui.broadcast.preset.search": "搜索预设…",
+  "gui.broadcast.preset.apply": "应用预设",
+  "gui.broadcast.preset.empty": "暂无预设,请用 /? listed 创建",
+  "gui.broadcast.rename.button": "改名",
+  "gui.broadcast.rename.title": "重命名音乐",
+  "gui.broadcast.rename.name": "新文件名"
 }

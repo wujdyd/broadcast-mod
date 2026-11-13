@@ -195,5 +195,18 @@
   "msg.broadcast.station_wrong_password": "Wrong password",
   "msg.broadcast.station_unlocked": "Station unlocked",
   "command.broadcast.help.find": "/? find <frequency> - show who occupies a frequency",
-  "command.broadcast.find_invalid": "Invalid frequency"
+  "command.broadcast.find_invalid": "Invalid frequency",
+  "gui.broadcast.access.set": "Set",
+  "command.broadcast.help.sre": "/? sre - force restart broadcast services (OP3)",
+  "command.broadcast.sre_done": "Broadcast services force-restarted",
+  "command.broadcast.help.listed": "/? listed <track1>*...*<trackN> <yes|no> <z|d|s> <preset> ; /? listed <preset> delete|save",
+  "command.broadcast.listed_invalid": "Invalid listed syntax",
+  "gui.broadcast.preset.open": "Presets",
+  "gui.broadcast.preset.title": "Broadcast Presets",
+  "gui.broadcast.preset.search": "Search presets...",
+  "gui.broadcast.preset.apply": "Apply preset",
+  "gui.broadcast.preset.empty": "No presets; create one with /? listed",
+  "gui.broadcast.rename.button": "Rename",
+  "gui.broadcast.rename.title": "Rename Music",
+  "gui.broadcast.rename.name": "New file name"
 }

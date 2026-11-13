@@ -24,6 +24,7 @@ public final class AudioSubtitleOverlay {
     private static void render(GuiGraphics g, int width, int height) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.screen != null || mc.options.hideGui) return;
+        if (!ClientDataHolder.subtitleVisible()) return;
         Component text;
         String music = ClientDataHolder.playingSubtitle();
         if (music != null) {

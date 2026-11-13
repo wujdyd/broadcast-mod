@@ -1,10 +1,10 @@
 # Broadcast Mod (Minecraft 1.20.1 + Forge)
 
-School / railway-station style broadcast system. Version: **0.0.4br**
+School / railway-station style broadcast system. Version: **0.0.1c**
 
-Release jar: `build/libs/broadcast-0.0.4br-all.jar` (bundled MP3/FLAC decoder, reobfuscated).
+Release jar: `build/libs/broadcast-0.0.1c-all.jar` (bundled MP3/FLAC decoder, reobfuscated).
 
-## 0.0.4br Highlights
+## 0.0.1c Highlights
 
 - Debugger durability is synced like a vanilla tool; no extra item tooltip lines.
 - ESC pause suspends OpenAL sources; adding a same-frequency speaker no longer restarts playback.
@@ -91,7 +91,7 @@ Video links are handled by the separate **Broadcast Media Support** addon; the m
 
 Install both:
 
-- `broadcast-0.0.4br-all.jar`
+- `broadcast-0.0.1c-all.jar`
 - `broadcast_media_support-1.0.1-fix2.jar`
 - or `broadcast_media_support-1.0.0-fix2.jar` (client download page)
 
@@ -101,7 +101,7 @@ The addon never downloads silently while playing. Open the download request page
 
 ## Multiplayer "Invalid session"
 
-That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.4br`.
+That is Mojang session authentication, not this mod. Use `online-mode=false` for private offline servers, or a genuine account able to reach `sessionserver.mojang.com`. Both sides must use the same jar. Network protocol: `0.0.1c`.
 
 ## License
 

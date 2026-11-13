@@ -56,6 +56,8 @@ public final class ClientDataHolder {
     private static final Map<BlockPos, DeviceView> DEVICES = new ConcurrentHashMap<>();
     private static final Map<BlockPos, PlayState> PLAY_STATES = new ConcurrentHashMap<>();
     private static final Map<BlockPos, Boolean> MIC_ACTIVE = new ConcurrentHashMap<>();
+    private static volatile long subtitleUntil;
+    private static volatile List<String> presets = List.of();
 
     private static final Set<String> CACHED = ConcurrentHashMap.newKeySet();
     private static final Map<String, ReceiveHandle> RECEIVES = new ConcurrentHashMap<>();
@@ -126,10 +128,25 @@ public final class ClientDataHolder {
     public static void setPlaybackState(BlockPos station, boolean playing, String target, boolean url,
                                         int volumePercent, List<BlockPos> speakers) {
         PLAY_STATES.put(station, new PlayState(playing, target, url, volumePercent, speakers));
+        if (playing) subtitleUntil = System.currentTimeMillis() + 6000L;
     }
 
     public static void setMicActive(BlockPos mic, boolean active, BlockPos station) {
         MIC_ACTIVE.put(mic, active);
+        if (active) subtitleUntil = System.currentTimeMillis() + 6000L;
+    }
+
+    /** 横幅只在播放开始/切换后的几秒内显示。 */
+    public static boolean subtitleVisible() {
+        return System.currentTimeMillis() < subtitleUntil;
+    }
+
+    public static void setPresets(List<String> names) {
+        presets = List.copyOf(names);
+    }
+
+    public static List<String> presets() {
+        return presets;
     }
 
     /** 当前正在播放的曲目名(用于音频字幕);没有则返回 null。 */

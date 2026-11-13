@@ -10,6 +10,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 
 /** 调试指令:/? ... ;危险操作需要 OP。 */
@@ -20,6 +22,8 @@ public final class BroadcastCommands {
             "command.broadcast.help.recipe",
             "command.broadcast.help.band",
             "command.broadcast.help.find",
+            "command.broadcast.help.sre",
+            "command.broadcast.help.listed",
             "command.broadcast.help.delete",
             "command.broadcast.help.restart",
             "command.broadcast.help.stopweb",
@@ -51,6 +55,10 @@ public final class BroadcastCommands {
                 .then(Commands.literal("find")
                         .then(Commands.argument("frequency", StringArgumentType.greedyString())
                                 .executes(BroadcastCommands::findFrequency)))
+                .then(Commands.literal("sre").executes(BroadcastCommands::forceRestart))
+                .then(Commands.literal("listed")
+                        .then(Commands.argument("args", StringArgumentType.greedyString())
+                                .executes(BroadcastCommands::listed)))
                 .executes(BroadcastCommands::listCommands));
     }
 
@@ -219,6 +227,117 @@ public final class BroadcastCommands {
         }
         source.sendSuccess(() -> Component.literal(f + " 已被占用: " + String.join(", ", owners)), false);
         return owners.size();
+    }
+
+    private static int forceRestart(CommandContext<CommandSourceStack> ctx) {
+        CommandSourceStack source = ctx.getSource();
+        if (!requireOp3(source)) return 0;
+        UploadHttpServer.stop();
+        MusicLibrary.get().reload();
+        com.broadcast.server.PresetManager.load(source.getServer());
+        FrequencyBandManager.load(source.getServer());
+        UploadHttpServer.start(source.getServer());
+        for (net.minecraft.server.level.ServerLevel level : source.getServer().getAllLevels()) {
+            var reg = com.broadcast.world.BroadcastRegistryData.get(level);
+            for (BlockPos pos : new java.util.ArrayList<>(reg.getStations())) {
+                if (level.isLoaded(pos)
+                        && level.getBlockEntity(pos) instanceof com.broadcast.blockentity.BroadcastStationBlockEntity station) {
+                    station.stopPreset();
+                    station.broadcastInfo();
+                }
+            }
+            for (BlockPos pos : new java.util.ArrayList<>(reg.getMicrophones())) {
+                if (level.isLoaded(pos)
+                        && level.getBlockEntity(pos) instanceof com.broadcast.blockentity.MicrophoneBlockEntity mic) {
+                    mic.forceStop();
+                }
+            }
+        }
+        source.sendSuccess(() -> Component.translatable("command.broadcast.sre_done"), true);
+        return 1;
+    }
+
+    private static int listed(CommandContext<CommandSourceStack> ctx) {
+        CommandSourceStack source = ctx.getSource();
+        String[] parts = StringArgumentType.getString(ctx, "args").trim().split("\\s+");
+        if (parts.length == 2 && ("delete".equalsIgnoreCase(parts[1]) || "save".equalsIgnoreCase(parts[1]))) {
+            String name = parts[0];
+            if ("delete".equalsIgnoreCase(parts[1])) {
+                if (com.broadcast.server.PresetManager.delete(name)) {
+                    source.sendSuccess(() -> Component.literal("预设已删除: " + name), true);
+                    return 1;
+                }
+                source.sendFailure(Component.literal("预设不存在: " + name));
+                return 0;
+            }
+            com.broadcast.server.PresetManager.Preset preset = com.broadcast.server.PresetManager.get(name);
+            if (preset == null) {
+                source.sendFailure(Component.literal("预设不存在: " + name));
+                return 0;
+            }
+            applyPresetNear(source, preset);
+            return 1;
+        }
+        if (parts.length < 4) {
+            source.sendFailure(Component.translatable("command.broadcast.listed_invalid"));
+            return 0;
+        }
+        int n = parts.length;
+        String name = parts[n - 1];
+        String order = parts[n - 2].toLowerCase(java.util.Locale.ROOT);
+        String loopRaw = parts[n - 3];
+        if (!order.equals("z") && !order.equals("d") && !order.equals("s")) {
+            source.sendFailure(Component.translatable("command.broadcast.listed_invalid"));
+            return 0;
+        }
+        boolean loop;
+        if ("yes".equalsIgnoreCase(loopRaw)) loop = true;
+        else if ("no".equalsIgnoreCase(loopRaw)) loop = false;
+        else {
+            source.sendFailure(Component.translatable("command.broadcast.listed_invalid"));
+            return 0;
+        }
+        StringBuilder trackPart = new StringBuilder();
+        for (int i = 0; i < n - 3; i++) {
+            if (i > 0) trackPart.append(' ');
+            trackPart.append(parts[i]);
+        }
+        java.util.List<String> tracks = new java.util.ArrayList<>();
+        for (String s : trackPart.toString().split("\\*")) {
+            if (!s.isBlank()) tracks.add(s.trim());
+        }
+        if (tracks.isEmpty()) {
+            source.sendFailure(Component.translatable("command.broadcast.listed_invalid"));
+            return 0;
+        }
+        com.broadcast.server.PresetManager.put(name, tracks, loop, order);
+        com.broadcast.server.PresetManager.Preset preset = com.broadcast.server.PresetManager.get(name);
+        source.sendSuccess(() -> Component.literal("预设已保存: " + name), true);
+        if (preset != null) applyPresetNear(source, preset);
+        return 1;
+    }
+
+    private static void applyPresetNear(CommandSourceStack source,
+                                        com.broadcast.server.PresetManager.Preset preset) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) return;
+        ServerLevel level = source.getLevel();
+        var reg = com.broadcast.world.BroadcastRegistryData.get(level);
+        BlockPos best = null;
+        double bestDist = 32 * 32;
+        for (BlockPos pos : reg.getStations()) {
+            if (!level.isLoaded(pos)) continue;
+            double d = player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+            if (d <= bestDist) {
+                bestDist = d;
+                best = pos;
+            }
+        }
+        if (best != null
+                && level.getBlockEntity(best) instanceof com.broadcast.blockentity.BroadcastStationBlockEntity station
+                && station.canAccess(player)) {
+            station.startPreset(preset.tracks(), preset.loop(), preset.order());
+        }
     }
 
     private static int deleteMusic(CommandContext<CommandSourceStack> ctx) {
